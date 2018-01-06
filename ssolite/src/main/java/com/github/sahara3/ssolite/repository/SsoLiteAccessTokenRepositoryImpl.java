@@ -1,0 +1,47 @@
+package com.github.sahara3.ssolite.repository;
+
+import java.time.OffsetDateTime;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.validation.constraints.NotNull;
+
+import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
+
+/**
+ * In-memory implementation of {@link SsoLiteAccessTokenRepository} interface.
+ *
+ * @author sahara3
+ */
+public class SsoLiteAccessTokenRepositoryImpl implements SsoLiteAccessTokenRepository {
+
+	private final ConcurrentMap<String, SsoLiteAccessToken> tokens = new ConcurrentHashMap<>();
+
+	@Override
+	public SsoLiteAccessToken findById(@NotNull String id) {
+		SsoLiteAccessToken token = this.tokens.get(id);
+		return token;
+	}
+
+	@Override
+	public void save(@NotNull SsoLiteAccessToken token) {
+		SsoLiteAccessToken current = this.tokens.putIfAbsent(token.getId(), token);
+		if (current != null) {
+			// FIXME: duplicate!
+		}
+
+		this.cleanupExpiredTokens();
+	}
+
+	@Override
+	public void delete(@NotNull String id) {
+		this.tokens.remove(id);
+
+		this.cleanupExpiredTokens();
+	}
+
+	protected void cleanupExpiredTokens() {
+		OffsetDateTime now = OffsetDateTime.now();
+		this.tokens.entrySet().removeIf(entry -> entry.getValue().getExpired().isBefore(now));
+	}
+}
