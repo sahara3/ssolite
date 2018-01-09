@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.config;
+package com.github.sahara3.ssolite.client;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

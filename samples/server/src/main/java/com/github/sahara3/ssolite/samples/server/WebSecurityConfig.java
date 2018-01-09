@@ -9,13 +9,12 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.github.sahara3.ssolite.SsoLiteAuthenticationSuccessHandler;
-import com.github.sahara3.ssolite.config.SsoLiteServerProperties;
-import com.github.sahara3.ssolite.service.SsoLiteAccessTokenService;
+import com.github.sahara3.ssolite.server.SsoLiteServerAuthenticationSuccessHandler;
+import com.github.sahara3.ssolite.server.SsoLiteServerProperties;
+import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenService;
 
 /**
  * Web security configuration for SSOLite server.
@@ -33,7 +32,7 @@ public class WebSecurityConfig {
 	 */
 	@Configuration
 	@Order(1)
-	public static class SsoAccessTokenApiSecurityConfig extends WebSecurityConfigurerAdapter {
+	public static class SsoLiteAccessTokenApiSecurityConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			// @formatter:off
@@ -64,8 +63,10 @@ public class WebSecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			AuthenticationSuccessHandler success_handler = new SsoLiteAuthenticationSuccessHandler(
-					this.ssoAccessTokenService, this.ssoServerProperties);
+			SsoLiteServerAuthenticationSuccessHandler successHandler = new SsoLiteServerAuthenticationSuccessHandler(
+					this.ssoAccessTokenService);
+			successHandler.setDefaultTopPageUrl(this.ssoServerProperties.getDefaultTopPageUrl());
+			successHandler.setPermittedDomainMap(this.ssoServerProperties.getPermittedDomainMap());
 
 			// @formatter:off
 			http.authorizeRequests()
@@ -76,7 +77,8 @@ public class WebSecurityConfig {
 			.formLogin()
 				.loginPage("/login")
 				.loginProcessingUrl("/login")
-				.successHandler(success_handler)
+				.successHandler(successHandler)
+				.permitAll()
 				.and()
 			.logout()
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout", RequestMethod.GET.name()))

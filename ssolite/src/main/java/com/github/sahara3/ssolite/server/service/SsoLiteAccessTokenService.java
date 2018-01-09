@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.service;
+package com.github.sahara3.ssolite.server.service;
 
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
 
@@ -21,12 +21,12 @@ public interface SsoLiteAccessTokenService {
 	SsoLiteAccessToken findValidAccessToken(String tokenId);
 
 	/**
-	 * Creates a new access token from the session ID.
+	 * Creates a new access token for the user.
 	 *
-	 * @param sessionId
+	 * @param username
 	 *            must not be null.
 	 * @return the newly created access token.
 	 */
-	SsoLiteAccessToken createAccessToken(String sessionId);
+	SsoLiteAccessToken createAccessToken(String username);
 
 }

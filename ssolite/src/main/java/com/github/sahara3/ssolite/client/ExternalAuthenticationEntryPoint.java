@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite;
+package com.github.sahara3.ssolite.client;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

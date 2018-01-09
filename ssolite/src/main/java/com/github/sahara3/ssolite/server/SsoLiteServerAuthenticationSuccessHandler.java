@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite;
+package com.github.sahara3.ssolite.server;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,10 +9,10 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -23,52 +23,39 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriUtils;
 
-import com.github.sahara3.ssolite.config.SsoLiteServerProperties;
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
-import com.github.sahara3.ssolite.service.SsoLiteAccessTokenService;
+import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenService;
 import com.github.sahara3.ssolite.util.ContextAwareRedirectUrlBuilder;
+import com.github.sahara3.ssolite.util.DomainUriUtils;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * Authentication success handler for SSOLite server.
  *
  * @author sahara3
  */
-public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+public class SsoLiteServerAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 	@NotNull
 	protected final SsoLiteAccessTokenService tokenService;
 
-	@NotNull
-	protected final SsoLiteServerProperties serverProperties;
+	// @NotNull
+	// protected final SsoLiteServerProperties serverProperties;
 
 	@NotNull
-	protected final Map<URI, URI> permittedDomainMap;
+	@Getter
+	@Setter
+	protected String defaultTopPageUrl;
 
-	@SuppressWarnings("static-method")
-	protected URI getDomainUri(@NonNull URI uri) throws URISyntaxException {
-		return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-	}
+	@NotNull
+	@Setter
+	protected Map<URI, URI> permittedDomainMap = new HashMap<>();
 
-	public SsoLiteAuthenticationSuccessHandler(@NonNull SsoLiteAccessTokenService tokenService,
-			@NonNull SsoLiteServerProperties serverProperties) {
-		if (tokenService == null) {
-			throw new IllegalArgumentException("tokenService cannot be null.");
-		}
+	public SsoLiteServerAuthenticationSuccessHandler(@NonNull SsoLiteAccessTokenService tokenService) {
 		this.tokenService = tokenService;
-		this.serverProperties = serverProperties;
-
-		this.permittedDomainMap = new HashMap<>();
-		serverProperties.getPermittedDomains().forEach(s -> {
-			try {
-				URI uri = new URI(s);
-				this.permittedDomainMap.put(this.getDomainUri(uri), uri);
-			}
-			catch (URISyntaxException e) {
-				this.logger.warn("Invalid URI: " + s, e);
-			}
-		});
 	}
 
 	@Override
@@ -87,7 +74,7 @@ public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthentication
 			this.redirectToInternal(request, response, authentication);
 		}
 		else {
-			this.redirectToExternal(request, response, from);
+			this.redirectToExternal(request, response, authentication, from);
 		}
 		return;
 	}
@@ -119,16 +106,16 @@ public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthentication
 	 */
 	protected void redirectToInternal(HttpServletRequest request, HttpServletResponse response,
 			Authentication authentication) throws ServletException, IOException {
-		SavedRequest saved_request = this.requestCache.getRequest(request, response);
+		SavedRequest savedRequest = this.requestCache.getRequest(request, response);
 
-		if (saved_request == null) {
+		if (savedRequest == null) {
 			super.onAuthenticationSuccess(request, response, authentication);
 			return;
 		}
 
-		String target_param = this.getTargetUrlParameter();
+		String targetUrlParameter = this.getTargetUrlParameter();
 		if (this.isAlwaysUseDefaultTargetUrl()
-				|| (target_param != null && StringUtils.hasText(request.getParameter(target_param)))) {
+				|| (targetUrlParameter != null && StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
 			this.requestCache.removeRequest(request, response);
 			super.onAuthenticationSuccess(request, response, authentication);
 			return;
@@ -137,7 +124,7 @@ public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthentication
 		this.clearAuthenticationAttributes(request);
 
 		// Use the DefaultSavedRequest URL
-		String target = saved_request.getRedirectUrl();
+		String target = savedRequest.getRedirectUrl();
 		this.logger.debug("Redirecting to DefaultSavedRequest Url: " + target);
 		this.getRedirectStrategy().sendRedirect(request, response, target);
 	}
@@ -175,7 +162,7 @@ public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthentication
 	}
 
 	protected String determineDefaultTargetUrl(@NonNull HttpServletRequest request) {
-		String top = this.serverProperties.getDefaultTopPageUrl();
+		String top = this.getDefaultTopPageUrl();
 		return this.redirectUrlBuilder.buildRedirectUrl(request, top);
 	}
 
@@ -183,8 +170,8 @@ public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthentication
 	// for external success handler
 	// ========================================================================
 
-	protected void redirectToExternal(HttpServletRequest request, HttpServletResponse response, @NonNull String from)
-			throws IOException {
+	protected void redirectToExternal(HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication, @NonNull String from) throws IOException {
 
 		String target;
 		if (!UrlUtils.isAbsoluteUrl(from)) {
@@ -206,8 +193,15 @@ public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthentication
 			}
 
 			// generate access token.
-			HttpSession session = request.getSession();
-			SsoLiteAccessToken token = this.tokenService.createAccessToken(session.getId());
+			Object principal = authentication.getPrincipal();
+			String username;
+			if (principal instanceof UserDetails) {
+				username = ((UserDetails) principal).getUsername();
+			}
+			else {
+				username = principal.toString();
+			}
+			SsoLiteAccessToken token = this.tokenService.createAccessToken(username);
 			builder.append("token=").append(UriUtils.encodeQueryParam(token.getId(), "utf-8"));
 
 			// next URL after SSO processing.
@@ -228,7 +222,7 @@ public class SsoLiteAuthenticationSuccessHandler extends SimpleUrlAuthentication
 		// TODO: support a domain that have multiple applications (sso-login).
 		try {
 			URI uri = new URI(from);
-			return this.permittedDomainMap.get(this.getDomainUri(uri));
+			return this.permittedDomainMap.get(DomainUriUtils.getDomainUri(uri));
 		}
 		catch (URISyntaxException e) {
 			this.logger.debug("Invalid from URL: " + from, e);

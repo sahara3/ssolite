@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
-import com.github.sahara3.ssolite.service.SsoLiteAccessTokenService;
+import com.github.sahara3.ssolite.samples.server.controller.SsoLiteAccessTokenNotFoundException;
+import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenService;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

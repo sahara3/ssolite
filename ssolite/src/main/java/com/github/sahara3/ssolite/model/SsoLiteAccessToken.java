@@ -18,7 +18,7 @@ public class SsoLiteAccessToken {
 
 	private String id;
 
-	private String sessionId;
+	private String username;
 
 	private OffsetDateTime expired;
 }

@@ -8,10 +8,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
-import com.github.sahara3.ssolite.repository.SsoLiteAccessTokenRepository;
-import com.github.sahara3.ssolite.repository.SsoLiteAccessTokenRepositoryImpl;
-import com.github.sahara3.ssolite.service.SsoLiteAccessTokenService;
-import com.github.sahara3.ssolite.service.SsoLiteAccessTokenServiceImpl;
+import com.github.sahara3.ssolite.server.SsoLiteServerProperties;
+import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepository;
+import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepositoryImpl;
+import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenService;
+import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenServiceImpl;
 
 import lombok.NonNull;
 

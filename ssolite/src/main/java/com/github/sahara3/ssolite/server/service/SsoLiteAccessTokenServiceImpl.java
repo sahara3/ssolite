@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.service;
+package com.github.sahara3.ssolite.server.service;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -6,7 +6,7 @@ import java.util.UUID;
 import javax.validation.constraints.NotNull;
 
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
-import com.github.sahara3.ssolite.repository.SsoLiteAccessTokenRepository;
+import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepository;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +38,10 @@ public class SsoLiteAccessTokenServiceImpl implements SsoLiteAccessTokenService 
 	}
 
 	@Override
-	public SsoLiteAccessToken createAccessToken(@NonNull String sessionId) {
+	public SsoLiteAccessToken createAccessToken(@NonNull String username) {
 		String id = UUID.randomUUID().toString();
 		OffsetDateTime expired = OffsetDateTime.now().plusSeconds(30);
-		SsoLiteAccessToken token = new SsoLiteAccessToken(id, sessionId, expired);
+		SsoLiteAccessToken token = new SsoLiteAccessToken(id, username, expired);
 		this.tokenRepository.save(token);
 		return token;
 	}

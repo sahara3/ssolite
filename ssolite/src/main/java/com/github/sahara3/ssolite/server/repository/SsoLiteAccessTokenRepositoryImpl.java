@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.repository;
+package com.github.sahara3.ssolite.server.repository;
 
 import java.time.OffsetDateTime;
 import java.util.concurrent.ConcurrentHashMap;
