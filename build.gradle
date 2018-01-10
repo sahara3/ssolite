@@ -148,7 +148,6 @@ project(':ssolite') {
         compile 'org.springframework.boot:spring-boot-autoconfigure'
         compile 'org.slf4j:slf4j-api'
         runtime 'commons-logging:commons-logging'
-        runtime 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     }
 
     jar {
@@ -211,7 +210,6 @@ project(':sample-server') {
         compile 'org.springframework.boot:spring-boot-starter-security'
         compile 'org.springframework.session:spring-session'
         compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
-        runtime 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     }
 }
 
@@ -228,6 +226,5 @@ project(':sample-client-spring') {
         compile 'org.springframework.boot:spring-boot-starter-security'
         //compile 'org.springframework.session:spring-session'
         compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
-        runtime 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     }
 }

@@ -1,6 +1,6 @@
 package com.github.sahara3.ssolite.server.repository;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -41,7 +41,7 @@ public class SsoLiteAccessTokenRepositoryImpl implements SsoLiteAccessTokenRepos
 	}
 
 	protected void cleanupExpiredTokens() {
-		OffsetDateTime now = OffsetDateTime.now();
-		this.tokens.entrySet().removeIf(entry -> entry.getValue().getExpired().isBefore(now));
+		Date now = new Date();
+		this.tokens.entrySet().removeIf(entry -> entry.getValue().getExpired().before(now));
 	}
 }

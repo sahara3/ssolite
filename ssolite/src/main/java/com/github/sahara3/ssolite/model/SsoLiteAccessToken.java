@@ -1,6 +1,6 @@
 package com.github.sahara3.ssolite.model;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,5 +20,5 @@ public class SsoLiteAccessToken {
 
 	private String username;
 
-	private OffsetDateTime expired;
+	private Date expired;
 }

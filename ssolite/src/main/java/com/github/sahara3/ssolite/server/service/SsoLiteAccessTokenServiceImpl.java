@@ -1,6 +1,7 @@
 package com.github.sahara3.ssolite.server.service;
 
 import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 import javax.validation.constraints.NotNull;
@@ -20,16 +21,15 @@ import lombok.RequiredArgsConstructor;
 public class SsoLiteAccessTokenServiceImpl implements SsoLiteAccessTokenService {
 
 	@NotNull
-	private final SsoLiteAccessTokenRepository tokenRepository;
+	private final SsoLiteAccessTokenRepository accessTokenRepository;
 
 	@Override
 	public SsoLiteAccessToken findValidAccessToken(@NonNull String tokenId) {
-		SsoLiteAccessToken token = this.tokenRepository.findById(tokenId);
+		SsoLiteAccessToken token = this.accessTokenRepository.findById(tokenId);
 		if (token != null) {
-			OffsetDateTime now = OffsetDateTime.now();
-			this.tokenRepository.delete(token.getId());
-			if (token.getExpired().isAfter(now)) {
-				// FIXME: session id should not be included.
+			Date now = new Date();
+			this.accessTokenRepository.delete(token.getId());
+			if (token.getExpired().after(now)) {
 				return token;
 			}
 			// fall through.
@@ -40,9 +40,9 @@ public class SsoLiteAccessTokenServiceImpl implements SsoLiteAccessTokenService 
 	@Override
 	public SsoLiteAccessToken createAccessToken(@NonNull String username) {
 		String id = UUID.randomUUID().toString();
-		OffsetDateTime expired = OffsetDateTime.now().plusSeconds(30);
+		Date expired = Date.from(OffsetDateTime.now().plusSeconds(30).toInstant());
 		SsoLiteAccessToken token = new SsoLiteAccessToken(id, username, expired);
-		this.tokenRepository.save(token);
+		this.accessTokenRepository.save(token);
 		return token;
 	}
 }
