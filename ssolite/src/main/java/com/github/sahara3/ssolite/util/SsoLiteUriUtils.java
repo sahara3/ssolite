@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 
 import lombok.NonNull;
 
-public class DomainUriUtils {
+public class SsoLiteUriUtils {
 
 	public static URI getDomainUri(@NonNull URI uri) throws URISyntaxException {
 		return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);

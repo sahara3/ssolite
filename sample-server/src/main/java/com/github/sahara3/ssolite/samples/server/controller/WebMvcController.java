@@ -13,7 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.github.sahara3.ssolite.server.SsoLiteServerProperties;
-import com.github.sahara3.ssolite.util.ContextAwareRedirectUrlBuilder;
+import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +34,8 @@ public class WebMvcController {
 	@NotNull
 	private final SsoLiteServerProperties ssoLiteServerProperties;
 
-	private final ContextAwareRedirectUrlBuilder redirectUrlBuilder = new ContextAwareRedirectUrlBuilder();
+	@NotNull
+	private final SsoLiteServerRedirectResolver redirectResolver;
 
 	/**
 	 * Login page.
@@ -52,18 +53,17 @@ public class WebMvcController {
 	 */
 	@GetMapping(path = "/login")
 	public String login(HttpServletRequest request, Authentication authentication, Model model) {
-		if (authentication != null && authentication.isAuthenticated()) {
-			String top = this.ssoLiteServerProperties.getDefaultTopPageUrl();
-			LOG.debug("Already logged in. Redirect to {}", top);
-			return "redirect:" + this.redirectUrlBuilder.buildRedirectUrl(request, top);
+		String from = request.getParameter("from");
+
+		if (authentication != null && authentication.isAuthenticated() && from != null) {
+			String next = this.redirectResolver.getRedirectDestination(from, authentication);
+			LOG.debug("Already logged in. Redirect to {}", next);
+			return "redirect:" + next;
 		}
 
 		// not logged in.
 		Arrays.asList("error", "logout").forEach(key -> model.addAttribute(key, request.getParameter(key)));
-
-		String from = request.getParameter("from");
 		model.addAttribute("from", from);
-
 		return "login";
 	}
 

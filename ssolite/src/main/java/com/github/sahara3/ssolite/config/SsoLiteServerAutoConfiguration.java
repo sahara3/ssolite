@@ -13,6 +13,7 @@ import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepository
 import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepositoryImpl;
 import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenService;
 import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenServiceImpl;
+import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 
 import lombok.NonNull;
 
@@ -42,7 +43,7 @@ public class SsoLiteServerAutoConfiguration {
 	/**
 	 * {@code SsoAccessTokenService} bean.
 	 *
-	 * @param ssoAccessTokenRepository
+	 * @param ssoLiteAccessTokenRepository
 	 *            must not be null.
 	 * @return the {@code SsoAccessTokenService} bean.
 	 */
@@ -50,7 +51,27 @@ public class SsoLiteServerAutoConfiguration {
 	@ConditionalOnMissingBean(SsoLiteAccessTokenService.class)
 	@SuppressWarnings("static-method")
 	public SsoLiteAccessTokenService ssoAccessTokenService(
-			@NonNull SsoLiteAccessTokenRepository ssoAccessTokenRepository) {
-		return new SsoLiteAccessTokenServiceImpl(ssoAccessTokenRepository);
+			@NonNull SsoLiteAccessTokenRepository ssoLiteAccessTokenRepository) {
+		return new SsoLiteAccessTokenServiceImpl(ssoLiteAccessTokenRepository);
+	}
+
+	/**
+	 * {@code SsoLiteServerRedirectResolver} bean.
+	 *
+	 * @param ssoLiteAccessTokenService
+	 *            must not be null.
+	 * @param ssoLiteServerProperties
+	 *            must not be null.
+	 * @return the {@code SsoLiteServerRedirectResolver} bean.
+	 */
+	@Bean
+	@ConditionalOnMissingBean(SsoLiteServerRedirectResolver.class)
+	@SuppressWarnings("static-method")
+	public SsoLiteServerRedirectResolver ssoLiteServerRedirectResolver(
+			@NonNull SsoLiteAccessTokenService ssoLiteAccessTokenService,
+			@NonNull SsoLiteServerProperties ssoLiteServerProperties) {
+		SsoLiteServerRedirectResolver resolver = new SsoLiteServerRedirectResolver(ssoLiteAccessTokenService);
+		resolver.setPermittedDomainMap(ssoLiteServerProperties.getPermittedDomainMap());
+		return resolver;
 	}
 }

@@ -16,7 +16,7 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.web.util.UriUtils;
 
-import com.github.sahara3.ssolite.util.ContextAwareRedirectUrlBuilder;
+import com.github.sahara3.ssolite.util.SsoLiteRedirectUrlBuilder;
 
 import lombok.NonNull;
 
@@ -29,7 +29,7 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 
 	private final boolean sameDomain;
 
-	private final ContextAwareRedirectUrlBuilder urlBuilder = new ContextAwareRedirectUrlBuilder();
+	private final SsoLiteRedirectUrlBuilder urlBuilder = new SsoLiteRedirectUrlBuilder();
 
 	public ExternalAuthenticationEntryPoint(@NonNull String loginFormUrl, boolean sameDomain) {
 		this.loginFormUrl = loginFormUrl;

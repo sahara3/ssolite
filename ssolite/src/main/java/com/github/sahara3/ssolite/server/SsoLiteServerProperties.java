@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import com.github.sahara3.ssolite.util.DomainUriUtils;
+import com.github.sahara3.ssolite.util.SsoLiteUriUtils;
 
 import lombok.Data;
 
@@ -36,7 +36,7 @@ public class SsoLiteServerProperties {
 		this.permittedDomains.forEach(s -> {
 			try {
 				URI uri = new URI(s);
-				map.put(DomainUriUtils.getDomainUri(uri), uri);
+				map.put(SsoLiteUriUtils.getDomainUri(uri), uri);
 			}
 			catch (URISyntaxException e) {
 				LOG.warn("Invalid URI: " + s, e);

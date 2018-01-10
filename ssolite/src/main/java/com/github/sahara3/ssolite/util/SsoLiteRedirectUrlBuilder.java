@@ -11,9 +11,9 @@ import org.springframework.security.web.util.UrlUtils;
 
 import lombok.NonNull;
 
-public class ContextAwareRedirectUrlBuilder {
+public class SsoLiteRedirectUrlBuilder {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ContextAwareRedirectUrlBuilder.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SsoLiteRedirectUrlBuilder.class);
 
 	private final PortResolver portResolver = new PortResolverImpl();
 

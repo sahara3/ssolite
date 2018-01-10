@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.github.sahara3.ssolite.server.SsoLiteServerAuthenticationSuccessHandler;
 import com.github.sahara3.ssolite.server.SsoLiteServerProperties;
-import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenService;
+import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 
 /**
  * Web security configuration for SSOLite server.
@@ -59,12 +59,12 @@ public class WebSecurityConfig {
 		private SsoLiteServerProperties ssoServerProperties;
 
 		@Autowired
-		private SsoLiteAccessTokenService ssoAccessTokenService;
+		private SsoLiteServerRedirectResolver redirectResolver;
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			SsoLiteServerAuthenticationSuccessHandler successHandler = new SsoLiteServerAuthenticationSuccessHandler(
-					this.ssoAccessTokenService);
+			SsoLiteServerAuthenticationSuccessHandler successHandler;
+			successHandler = new SsoLiteServerAuthenticationSuccessHandler(this.redirectResolver);
 			successHandler.setDefaultTopPageUrl(this.ssoServerProperties.getDefaultTopPageUrl());
 			successHandler.setPermittedDomainMap(this.ssoServerProperties.getPermittedDomainMap());
 
