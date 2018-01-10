@@ -132,7 +132,7 @@ subprojects { subproject ->
 // ===================================================================
 project(':ssolite') {
     group = 'com.github.sahara3'
-    version = '0.0.2.SNAPSHOT'
+    version = '0.0.2'
 
     apply plugin: 'java'
     apply plugin: 'maven'
