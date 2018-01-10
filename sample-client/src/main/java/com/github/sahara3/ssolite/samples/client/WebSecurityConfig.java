@@ -3,6 +3,7 @@ package com.github.sahara3.ssolite.samples.client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -59,11 +60,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// additional authentication provider.
-		SsoLiteAccessTokenAuthenticationProvider provider = new SsoLiteAccessTokenAuthenticationProvider(
+		// SSOLite authentication provider.
+		SsoLiteAccessTokenAuthenticationProvider ssoProvider = new SsoLiteAccessTokenAuthenticationProvider(
 				this.ssoLiteClientProperties.getTokenApiUrl(), this.restTemplateBuilder.build(),
 				this.userDetailsService);
-		auth.authenticationProvider(provider);
+		auth.authenticationProvider(ssoProvider);
+
+		// local authentication provider.
+		DaoAuthenticationProvider localProvider = new DaoAuthenticationProvider();
+		localProvider.setUserDetailsService(this.userDetailsService);
+		auth.authenticationProvider(localProvider);
 	}
 
 	@Override
