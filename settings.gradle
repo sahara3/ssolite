@@ -1,5 +1,5 @@
 rootProject.name = 'root'
 
 include ':ssolite'
-include ':samples:server'
-include ':samples:client'
+include ':sample-server'
+include ':sample-client'

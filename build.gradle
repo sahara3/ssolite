@@ -101,18 +101,27 @@ subprojects { subproject ->
         tasks.eclipse {
             dependsOn cleanEclipse
             doLast {
-                def project_dir = (['..'] * project.depth).join('/')
-                file('.settings/org.eclipse.buildship.core.prefs').append("""
-                    connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
-                    connection.project.dir=${project_dir}
-                    eclipse.preferences.version=1
-                """.stripIndent())
+                def settings_dir = file('.settings')
+                if (settings_dir.exists()) {
+                    def project_dir = (['..'] * project.depth).join('/')
+                    file("${settings_dir}/org.eclipse.buildship.core.prefs").append("""
+                        connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
+                        connection.project.dir=${project_dir}
+                        eclipse.preferences.version=1
+                    """.stripIndent())
+                }
             }
         }
 
         tasks.cleanEclipse {
             doLast {
                 delete '.settings'
+            }
+        }
+
+        tasks.clean {
+            doLast {
+                delete 'bin'
             }
         }
     }
@@ -189,14 +198,7 @@ project(':ssolite') {
 // ===================================================================
 //  Sample Server and Client
 // ===================================================================
-project(':samples') {
-    apply plugin: 'java'
-    apply plugin: 'eclipse'
-    tasks.each { it.enabled = false }
-    tasks.cleanEclipse.enabled = true
-}
-
-project(':samples:server') {
+project(':sample-server') {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'org.springframework.boot'
@@ -213,7 +215,7 @@ project(':samples:server') {
     }
 }
 
-project(':samples:client') {
+project(':sample-client') {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'org.springframework.boot'
