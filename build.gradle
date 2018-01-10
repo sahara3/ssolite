@@ -215,7 +215,7 @@ project(':sample-server') {
     }
 }
 
-project(':sample-client') {
+project(':sample-client-spring') {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'org.springframework.boot'

@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.samples.client;
+package com.github.sahara3.ssolite.samples.client.spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;

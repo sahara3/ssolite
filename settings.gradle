@@ -2,4 +2,4 @@ rootProject.name = 'root'
 
 include ':ssolite'
 include ':sample-server'
-include ':sample-client'
+include ':sample-client-spring'

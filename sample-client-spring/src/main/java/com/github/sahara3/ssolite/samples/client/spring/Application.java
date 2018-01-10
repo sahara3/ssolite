@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.samples.client;
+package com.github.sahara3.ssolite.samples.client.spring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

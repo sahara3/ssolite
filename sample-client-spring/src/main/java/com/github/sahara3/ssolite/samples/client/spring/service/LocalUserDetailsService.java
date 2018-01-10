@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.samples.client.service;
+package com.github.sahara3.ssolite.samples.client.spring.service;
 
 import java.util.Arrays;
 
