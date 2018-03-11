@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.github.sahara3.ssolite.server.SsoLiteServerProperties;
+import com.github.sahara3.ssolite.config.SsoLiteServerProperties;
 import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 
 import lombok.RequiredArgsConstructor;

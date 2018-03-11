@@ -1,5 +1,7 @@
 package com.github.sahara3.ssolite.server.repository;
 
+import javax.validation.constraints.NotNull;
+
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
 
 /**
@@ -14,9 +16,9 @@ public interface SsoLiteAccessTokenRepository {
 	 *
 	 * @param id
 	 *            must not be null.
-	 * @return the access token with the given ID.
+	 * @return the access token with the given ID, or null if not found.
 	 */
-	SsoLiteAccessToken findById(String id);
+	SsoLiteAccessToken findById(@NotNull String id);
 
 	/**
 	 * Saves a given access token.
@@ -24,7 +26,7 @@ public interface SsoLiteAccessTokenRepository {
 	 * @param token
 	 *            must not be null.
 	 */
-	void save(SsoLiteAccessToken token);
+	void save(@NotNull SsoLiteAccessToken token);
 
 	/**
 	 * Deletes an access token by its ID.
@@ -32,6 +34,6 @@ public interface SsoLiteAccessTokenRepository {
 	 * @param id
 	 *            must not be null.
 	 */
-	void delete(String id);
+	void delete(@NotNull String id);
 
 }

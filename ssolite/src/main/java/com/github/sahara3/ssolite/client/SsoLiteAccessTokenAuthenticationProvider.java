@@ -1,7 +1,5 @@
 package com.github.sahara3.ssolite.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -25,10 +23,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Authentication provider for SSOLite client.
+ *
+ * @author sahara3
+ *
+ */
+@Slf4j
 public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationProvider {
-
-	private static final Logger LOG = LoggerFactory.getLogger(SsoLiteAccessTokenAuthenticationProvider.class);
 
 	@Override
 	public boolean supports(Class<?> authentication) {
@@ -44,6 +48,14 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
 	@Getter(AccessLevel.PROTECTED)
 	private final UserDetailsService userDetailsService;
 
+	/**
+	 * @param accessTokenApiUrl
+	 *            the URL of the access token API.
+	 * @param restTemplate
+	 *            REST template object to request to the access token API.
+	 * @param userDetailsService
+	 *            Your {@link UserDetailsService} implementation.
+	 */
 	public SsoLiteAccessTokenAuthenticationProvider(@NonNull String accessTokenApiUrl,
 			@NonNull RestTemplate restTemplate, @NonNull UserDetailsService userDetailsService) {
 		this.accessTokenApiUrl = accessTokenApiUrl;
@@ -71,7 +83,7 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
 		try {
 			user = this.retrieveUser(tokenId);
 		}
-		catch (UsernameNotFoundException e) { // FIXME
+		catch (UsernameNotFoundException e) {
 			LOG.debug("User '{}' not found.", tokenId);
 
 			if (this.isHideUserNotFoundExceptions()) {
@@ -99,7 +111,7 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
 	protected final UserDetails retrieveUser(String accessTokenId) throws AuthenticationException {
 		if (accessTokenId == null || accessTokenId.isEmpty()) {
 			LOG.debug("Invalid access token ID: {}", accessTokenId);
-			throw new RuntimeException("FIXME");
+			throw new BadCredentialsException("Bad credentials.");
 		}
 
 		// call RESTful API to retrieve the username in the access token.

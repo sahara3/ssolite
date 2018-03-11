@@ -15,7 +15,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import com.github.sahara3.ssolite.client.ExternalAuthenticationEntryPoint;
 import com.github.sahara3.ssolite.client.SsoLiteAccessTokenAuthenticationProvider;
 import com.github.sahara3.ssolite.client.SsoLiteClientLoginConfigurer;
-import com.github.sahara3.ssolite.client.SsoLiteClientProperties;
+import com.github.sahara3.ssolite.config.SsoLiteClientProperties;
 
 /**
  * Sample web security configuration for SSOLite client.

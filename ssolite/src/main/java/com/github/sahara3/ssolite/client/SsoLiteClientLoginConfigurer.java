@@ -1,8 +1,7 @@
 package com.github.sahara3.ssolite.client;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 
-import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,17 +13,31 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
+import lombok.NonNull;
+
+/**
+ * Configures SSOLite client authentication.
+ *
+ * @author sahara3
+ */
 public class SsoLiteClientLoginConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
+	@NotNull
 	private final SsoLiteAccessTokenAuthenticationProcessingFilter authenticationFilter;
 
-	public SsoLiteClientLoginConfigurer(String filterProcessesUrl) {
+	/**
+	 * Creates a new SSOLIte client authentication configurator.
+	 *
+	 * @param filterProcessesUrl
+	 *            the URL where a
+	 *            {@link SsoLiteAccessTokenAuthenticationProcessingFilter}
+	 *            works.
+	 */
+	public SsoLiteClientLoginConfigurer(@NonNull String filterProcessesUrl) {
 		this.authenticationFilter = new SsoLiteAccessTokenAuthenticationProcessingFilter(filterProcessesUrl);
 		this.successHandler = new SsoLiteClientAuthenticationSuccessHandler();
 		this.failureHandler = new SimpleUrlAuthenticationFailureHandler();
 	}
-
-	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource;
 
 	private AuthenticationSuccessHandler successHandler;
 
@@ -42,9 +55,6 @@ public class SsoLiteClientLoginConfigurer extends SecurityConfigurerAdapter<Defa
 		this.authenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
 		this.authenticationFilter.setAuthenticationSuccessHandler(this.successHandler);
 		this.authenticationFilter.setAuthenticationFailureHandler(this.failureHandler);
-		if (this.authenticationDetailsSource != null) {
-			this.authenticationFilter.setAuthenticationDetailsSource(this.authenticationDetailsSource);
-		}
 		SessionAuthenticationStrategy sessionAuthenticationStrategy = http
 				.getSharedObject(SessionAuthenticationStrategy.class);
 		if (sessionAuthenticationStrategy != null) {
@@ -55,7 +65,7 @@ public class SsoLiteClientLoginConfigurer extends SecurityConfigurerAdapter<Defa
 			this.authenticationFilter.setRememberMeServices(rememberMeServices);
 		}
 
-		SsoLiteAccessTokenAuthenticationProcessingFilter filter = postProcess(this.authenticationFilter);
+		SsoLiteAccessTokenAuthenticationProcessingFilter filter = this.postProcess(this.authenticationFilter);
 		http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 	}
 }

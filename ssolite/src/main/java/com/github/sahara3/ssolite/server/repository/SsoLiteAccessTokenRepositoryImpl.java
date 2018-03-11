@@ -25,10 +25,7 @@ public class SsoLiteAccessTokenRepositoryImpl implements SsoLiteAccessTokenRepos
 
 	@Override
 	public void save(@NotNull SsoLiteAccessToken token) {
-		SsoLiteAccessToken current = this.tokens.putIfAbsent(token.getId(), token);
-		if (current != null) {
-			// FIXME: duplicate!
-		}
+		this.tokens.put(token.getId(), token);
 
 		this.cleanupExpiredTokens();
 	}

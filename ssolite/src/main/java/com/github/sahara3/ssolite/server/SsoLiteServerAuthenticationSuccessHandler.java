@@ -32,9 +32,6 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-	// @NotNull
-	// protected final SsoLiteAccessTokenService tokenService;
-
 	@NotNull
 	protected final SsoLiteServerRedirectResolver redirectResolver;
 

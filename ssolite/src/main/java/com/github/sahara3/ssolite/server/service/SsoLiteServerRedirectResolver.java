@@ -3,13 +3,12 @@ package com.github.sahara3.ssolite.server.service;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.util.UrlUtils;
@@ -23,12 +22,19 @@ import com.github.sahara3.ssolite.util.SsoLiteUriUtils;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * SSOLite redirect resolver.
+ *
+ * This resolves and returns the redirect URL after login.
+ *
+ * @author sahara3
+ */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SsoLiteServerRedirectResolver {
-
-	private static Logger LOG = LoggerFactory.getLogger(SsoLiteServerRedirectResolver.class);
 
 	@NotNull
 	protected final SsoLiteAccessTokenService tokenService;
@@ -37,6 +43,15 @@ public class SsoLiteServerRedirectResolver {
 	@Setter
 	protected Map<URI, URI> permittedDomainMap = new HashMap<>();
 
+	/**
+	 * Resolves and returns the redirect URL after login.
+	 *
+	 * @param from
+	 *            the URL where an user came from before login.
+	 * @param authentication
+	 *            the authentication token when logged in.
+	 * @return the redirect URL.
+	 */
 	public String getRedirectDestination(@NonNull String from, @NonNull Authentication authentication) {
 		if (!UrlUtils.isAbsoluteUrl(from)) {
 			return from;
@@ -44,7 +59,7 @@ public class SsoLiteServerRedirectResolver {
 
 		URI destination = this.getSsoRedirectDestinationUri(from);
 		if (destination == null) {
-			// FIXME: runtime error is collect?
+			// TODO: Throws some new exception represents HTTP 403.
 			throw new RuntimeException("Not permitted domain: " + from);
 		}
 
@@ -92,7 +107,7 @@ public class SsoLiteServerRedirectResolver {
 
 	private static String encodeQueryParam(@NonNull String value) {
 		try {
-			return UriUtils.encodeQueryParam(value, "UTF-8");
+			return UriUtils.encodeQueryParam(value, StandardCharsets.UTF_8.name());
 		}
 		catch (UnsupportedEncodingException e) {
 			// wrap the exception.

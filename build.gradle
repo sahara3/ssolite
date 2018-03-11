@@ -26,7 +26,6 @@ allprojects {
         dependencies {
             dependency 'org.projectlombok:lombok:1.16.20'
             dependency 'org.slf4j:slf4j-api:1.7.25'
-            //dependency 'commons-logging:commons-logging:1.2'
 
             dependency 'javax.servlet:javax.servlet-api:3.1.0'
             dependency 'javax.validation:validation-api:2.0.0.Final'
@@ -80,11 +79,12 @@ subprojects { subproject ->
         }
 
         tasks.withType(Javadoc) {
-            options.encoding = encoding
-            options.charSet = encoding
-
             dependsOn delombok
             source = delombok.outputDir
+
+            options.encoding = encoding
+            options.charSet = encoding
+            //options.links 'http://docs.oracle.com/javase/8/docs/api/'
         }
     }
 
@@ -142,7 +142,7 @@ subprojects { subproject ->
 // ===================================================================
 project(':ssolite') {
     group = 'com.github.sahara3'
-    version = '0.0.3.SNAPSHOT'
+    version = '0.0.3'
 
     apply plugin: 'java'
     apply plugin: 'maven'

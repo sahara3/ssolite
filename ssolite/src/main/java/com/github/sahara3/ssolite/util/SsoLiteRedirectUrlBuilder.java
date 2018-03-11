@@ -2,21 +2,33 @@ package com.github.sahara3.ssolite.util;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.web.PortResolver;
 import org.springframework.security.web.PortResolverImpl;
 import org.springframework.security.web.util.RedirectUrlBuilder;
 import org.springframework.security.web.util.UrlUtils;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Utility for building redirect URL builder.
+ *
+ * @author sahara3
+ */
+@Slf4j
 public class SsoLiteRedirectUrlBuilder {
-
-	private static final Logger LOG = LoggerFactory.getLogger(SsoLiteRedirectUrlBuilder.class);
 
 	private final PortResolver portResolver = new PortResolverImpl();
 
+	/**
+	 * Builds redirect URL and return it.
+	 *
+	 * @param request
+	 *            the request object.
+	 * @param url
+	 *            the URL to redirect.
+	 * @return the redirect URL.
+	 */
 	public String buildRedirectUrl(@NonNull HttpServletRequest request, @NonNull String url) {
 		if (UrlUtils.isAbsoluteUrl(url)) {
 			LOG.debug("URL is absolute: {}", url);

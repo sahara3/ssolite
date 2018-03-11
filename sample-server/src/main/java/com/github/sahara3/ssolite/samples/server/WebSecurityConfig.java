@@ -12,8 +12,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import com.github.sahara3.ssolite.config.SsoLiteServerProperties;
 import com.github.sahara3.ssolite.server.SsoLiteServerAuthenticationSuccessHandler;
-import com.github.sahara3.ssolite.server.SsoLiteServerProperties;
 import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 
 /**

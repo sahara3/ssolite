@@ -1,4 +1,4 @@
-package com.github.sahara3.ssolite.server;
+package com.github.sahara3.ssolite.config;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,6 +30,11 @@ public class SsoLiteServerProperties {
 
 	private List<String> permittedDomains = new ArrayList<>();
 
+	/**
+	 * Returns the map of SSO permitted domains.
+	 *
+	 * @return the map of SSO permitted domains.
+	 */
 	public Map<URI, URI> getPermittedDomainMap() {
 		Map<URI, URI> map = new HashMap<>();
 

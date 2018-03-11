@@ -5,9 +5,27 @@ import java.net.URISyntaxException;
 
 import lombok.NonNull;
 
+/**
+ * URI utilities for SSOLIte.
+ *
+ * @author sahara3
+ */
 public class SsoLiteUriUtils {
 
-	public static URI getDomainUri(@NonNull URI uri) throws URISyntaxException {
-		return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+	/**
+	 * Returns a domain URI.
+	 *
+	 * @param uri
+	 *            the original URI.
+	 * @return the domain URI.
+	 */
+	public static URI getDomainUri(@NonNull URI uri) {
+		try {
+			return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+		}
+		catch (URISyntaxException e) {
+			// Unreachable code.
+			throw new RuntimeException(e);
+		}
 	}
 }

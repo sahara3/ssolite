@@ -9,6 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
+/**
+ * Authentication success handler for SSOLite client.
+ *
+ * @author sahara3
+ */
 public class SsoLiteClientAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 	@Override

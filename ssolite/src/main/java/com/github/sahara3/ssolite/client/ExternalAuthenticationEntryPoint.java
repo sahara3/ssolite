@@ -2,14 +2,13 @@ package com.github.sahara3.ssolite.client;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -19,10 +18,16 @@ import org.springframework.web.util.UriUtils;
 import com.github.sahara3.ssolite.util.SsoLiteRedirectUrlBuilder;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * {@link AuthenticationEntryPoint} implementation that redirects to an external
+ * server URL.
+ *
+ * @author sahara3
+ */
+@Slf4j
 public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoint {
-
-	private static final Logger LOG = LoggerFactory.getLogger(ExternalAuthenticationEntryPoint.class);
 
 	@NotNull
 	private final String loginFormUrl;
@@ -31,11 +36,30 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 
 	private final SsoLiteRedirectUrlBuilder urlBuilder = new SsoLiteRedirectUrlBuilder();
 
+	/**
+	 * Constructor that can specify external or not.
+	 *
+	 * @param loginFormUrl
+	 *            the URL of login form.
+	 * @param sameDomain
+	 *            set true if the {@code loginFormUrl} is on the same domain.
+	 */
 	public ExternalAuthenticationEntryPoint(@NonNull String loginFormUrl, boolean sameDomain) {
 		this.loginFormUrl = loginFormUrl;
 		this.sameDomain = sameDomain;
 	}
 
+	/**
+	 * Constructs the external entry point.
+	 *
+	 * <p>
+	 * This is same as
+	 * {@code #ExternalAuthenticationEntryPoint(loginFormUrl, false)}.
+	 * </p>
+	 *
+	 * @param loginFormUrl
+	 *            the URL of login form.
+	 */
 	public ExternalAuthenticationEntryPoint(@NonNull String loginFormUrl) {
 		this(loginFormUrl, false);
 	}
@@ -59,11 +83,11 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 		// append "from".
 		if (from != null) {
 			try {
-				String encoded = UriUtils.encodeQueryParam(from, "utf-8");
+				String encoded = UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8.name());
 				redirectUrl += "?from=" + encoded;
 			}
 			catch (UnsupportedEncodingException e) {
-				// NOTE: thrown only if "utf-8" is not supported.
+				// NOTE: thrown only if "UTF-8" is not supported.
 				throw new RuntimeException(e);
 			}
 		}
