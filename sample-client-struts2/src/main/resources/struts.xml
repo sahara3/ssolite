@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
+        "http://struts.apache.org/dtds/struts-2.5.dtd">
+<struts>
+  <constant name="struts.devMode" value="true" />
+  <constant name="struts.action.extension" value="" />
+  <constant name="struts.custom.i18n.resources" value="application" />
+
+  <package name="root" extends="struts-default" namespace="/">
+
+    <interceptors>
+      <interceptor name="authentication" class="com.github.sahara3.ssolite.samples.client.struts2.interceptor.AuthInterceptor" />
+
+      <interceptor-stack name="appDefaultStack">
+        <interceptor-ref name="authentication" />
+        <interceptor-ref name="defaultStack">
+          <param name="exception.logEnabled">true</param>
+          <param name="exception.logLevel">ERROR</param>
+          <param name="params.excludeParams">dojo\..*,^struts\..*,^session\..*,^request\..*,^application\..*,^servlet(Request|Response)\..*,parameters\...*,submit</param>
+        </interceptor-ref>
+      </interceptor-stack>
+
+      <interceptor-stack name="authStack">
+        <interceptor-ref name="defaultStack">
+          <param name="exception.logEnabled">true</param>
+          <param name="exception.logLevel">ERROR</param>
+          <param name="params.excludeParams">dojo\..*,^struts\..*,^session\..*,^request\..*,^application\..*,^servlet(Request|Response)\..*,parameters\...*,submit</param>
+        </interceptor-ref>
+      </interceptor-stack>
+
+    </interceptors>
+
+    <default-interceptor-ref name="appDefaultStack" />
+
+    <global-results>
+      <!-- result name="need.login" type="redirectAction">login</result -->
+      <result name="need.login" type="chain">sso-entry-point</result>
+    </global-results>
+
+    <action name="" class="com.github.sahara3.ssolite.samples.client.struts2.action.IndexAction" method="show">
+      <result name="success">/WEB-INF/jsp/index.jsp</result>
+    </action>
+
+    <action name="index" class="com.github.sahara3.ssolite.samples.client.struts2.action.IndexAction" method="show">
+      <result name="success">/WEB-INF/jsp/index.jsp</result>
+    </action>
+
+    <action name="login" class="com.github.sahara3.ssolite.samples.client.struts2.action.LoginAction" method="show">
+      <interceptor-ref name="authStack" />
+      <result name="success">/WEB-INF/jsp/login.jsp</result>
+      <result name="redirect.default" type="redirectAction">index</result>
+    </action>
+
+    <action name="login.do" class="com.github.sahara3.ssolite.samples.client.struts2.action.LoginAction">
+      <interceptor-ref name="authStack" />
+      <result name="redirect.default" type="redirectAction">index</result>
+      <result name="redirect" type="redirect">
+      	<param name="location">${redirectUrl}</param>
+      </result>
+      <result name="error" type="redirectAction">
+        <param name="actionName">login</param>
+        <param name="error">true</param>
+      </result>
+    </action>
+
+    <action name="logout.do" class="com.github.sahara3.ssolite.samples.client.struts2.action.LogoutAction">
+      <result name="success" type="redirectAction">
+        <param name="actionName">login</param>
+        <param name="logout">true</param>
+      </result>
+    </action>
+
+    <action name="sso-login" class="com.github.sahara3.ssolite.samples.client.struts2.action.SsoLiteLoginAction">
+      <interceptor-ref name="authStack" />
+      <result name="redirect.default" type="redirectAction">index</result>
+      <result name="redirect" type="redirect">
+      	<param name="location">${redirectUrl}</param>
+      </result>
+      <result name="error" type="redirectAction">
+        <param name="actionName">sso-entry-point</param>
+        <param name="error">true</param>
+      </result>
+    </action>
+
+    <action name="sso-entry-point" class="com.github.sahara3.ssolite.samples.client.struts2.action.SsoLiteEntryPointAction">
+      <interceptor-ref name="authStack" />
+      <result name="redirect" type="redirect">
+        <param name="location">${redirectUrl}</param>
+      </result>
+    </action>
+
+  </package>
+</struts>

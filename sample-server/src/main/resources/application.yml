@@ -42,4 +42,4 @@ ssolite:
     enabled: true
     default-top-page-url: internal:/
     permitted-domains:
-    - http://localhost:8081/sso-login
+    - http://127.0.0.1:8081/sso-login
