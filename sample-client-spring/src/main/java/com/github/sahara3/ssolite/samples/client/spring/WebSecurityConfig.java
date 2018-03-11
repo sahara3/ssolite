@@ -52,7 +52,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 			.formLogin()
 				.loginPage("/login")
-				.permitAll();
+				.permitAll()
+				.and()
+			.logout()
+				.logoutUrl("/logout");
 		// @formatter:on
 
 		http.apply(new SsoLiteClientLoginConfigurer("/sso-login"));

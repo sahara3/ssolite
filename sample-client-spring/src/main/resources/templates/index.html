@@ -3,10 +3,16 @@
       xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="utf-8" />
-    <title>Client Application</title>
+    <title>Client Application by Spring</title>
   </head>
   <body>
-    <h1>SSOLite - Client Application Page</h1>
+    <h1>SSOLite - Client Application Page (Spring)</h1>
     <p>This page requires authentication.</p>
+
+    <form method="POST" action="/logout">
+      <input type="submit" value="Local Logout" />
+      <p>FIXME: Move to SSO login page after logout?</p>
+      <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+    </form>
   </body>
 </html>

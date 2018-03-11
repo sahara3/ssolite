@@ -16,7 +16,7 @@ public class LocalUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// NOTE: this is a psuedo implementation.
 		if ("admin".equals(username)) {
-			User user = new User("admin", "password", Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
+			User user = new User("admin", "spring", Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN")));
 			return user;
 		}
 		throw new UsernameNotFoundException(username);
