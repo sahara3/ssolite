@@ -35,12 +35,15 @@ public class WebSecurityConfig {
 	public static class SsoLiteAccessTokenApiSecurityConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			String urlPattern = "/api/tokens/**";
+
+			http.csrf().ignoringAntMatchers(urlPattern);
+
 			// @formatter:off
-			http.antMatcher("/api/tokens/**") // FIXME: Is it OK to permit all?
+			http.antMatcher(urlPattern)
 				.sessionManagement()
 					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 					.and()
-				.csrf().disable()
 				.authorizeRequests()
 					.anyRequest().permitAll();
 			// @formatter:on
@@ -70,21 +73,16 @@ public class WebSecurityConfig {
 
 			// @formatter:off
 			http.authorizeRequests()
-				.regexMatchers("/login", "/login\\?(logout|error|from=.*)").permitAll()
-				.antMatchers("/**").authenticated()
 				.anyRequest().authenticated()
 				.and()
 			.formLogin()
 				.loginPage("/login")
-				.loginProcessingUrl("/login")
 				.successHandler(successHandler)
 				.permitAll()
 				.and()
 			.logout()
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout", RequestMethod.GET.name()))
-				.logoutSuccessUrl("/login?logout")
-				.clearAuthentication(true)
-				.invalidateHttpSession(true);
+				.logoutSuccessUrl("/login?logout");
 			// @formatter:on
 		}
 
@@ -95,8 +93,8 @@ public class WebSecurityConfig {
 
 		@Override
 		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			// TODO: implement as a bean. (UserDetailsService?) and use DB.
-			auth.inMemoryAuthentication().withUser("admin").password("admin").roles("ADMIN");
+			// TODO: You should implement more secure UserDetailsService.
+			auth.inMemoryAuthentication().withUser("admin").password("{noop}admin").roles("ADMIN");
 		}
 	}
 }

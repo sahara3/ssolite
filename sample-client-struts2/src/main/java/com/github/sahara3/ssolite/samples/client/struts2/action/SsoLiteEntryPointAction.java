@@ -1,7 +1,5 @@
 package com.github.sahara3.ssolite.samples.client.struts2.action;
 
-import java.io.UnsupportedEncodingException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -44,14 +42,8 @@ public class SsoLiteEntryPointAction extends ActionSupport implements ServletReq
 
 		// append "from".
 		if (from != null) {
-			try {
-				String encoded = UriUtils.encodeQueryParam(from, "utf-8");
-				this.redirectUrl += "?from=" + encoded;
-			}
-			catch (UnsupportedEncodingException e) {
-				// NOTE: thrown only if "utf-8" is not supported.
-				throw new RuntimeException(e);
-			}
+			String encoded = UriUtils.encodeQueryParam(from, "utf-8");
+			this.redirectUrl += "?from=" + encoded;
 		}
 
 		LOG.debug("Redirect URL: {}", this.redirectUrl);

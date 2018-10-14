@@ -1,6 +1,5 @@
 package com.github.sahara3.ssolite.server.service;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -106,12 +105,6 @@ public class SsoLiteServerRedirectResolver {
 	}
 
 	private static String encodeQueryParam(@NonNull String value) {
-		try {
-			return UriUtils.encodeQueryParam(value, StandardCharsets.UTF_8.name());
-		}
-		catch (UnsupportedEncodingException e) {
-			// wrap the exception.
-			throw new RuntimeException(e);
-		}
+		return UriUtils.encodeQueryParam(value, StandardCharsets.UTF_8.name());
 	}
 }

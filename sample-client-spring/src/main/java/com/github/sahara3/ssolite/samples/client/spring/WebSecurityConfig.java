@@ -3,13 +3,11 @@ package com.github.sahara3.ssolite.samples.client.spring;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import com.github.sahara3.ssolite.client.ExternalAuthenticationEntryPoint;
@@ -30,9 +28,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private RestTemplateBuilder restTemplateBuilder;
 
 	@Autowired
-	private UserDetailsService userDetailsService;
-
-	@Autowired
 	private SsoLiteClientProperties ssoLiteClientProperties;
 
 	@Override
@@ -47,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authenticationEntryPoint(entryPoint)
 				.and()
 			.authorizeRequests()
-				.antMatchers("/login", "/sso-login").permitAll()
+				.antMatchers("/sso-login").permitAll()
 				.anyRequest().authenticated()
 				.and()
 			.formLogin()
@@ -63,16 +58,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		// local authentication provider.
+		// TODO: You should implement more secure UserDetailsService.
+		auth.inMemoryAuthentication().withUser("admin").password("{noop}spring").roles("ADMIN");
+
 		// SSOLite authentication provider.
 		SsoLiteAccessTokenAuthenticationProvider ssoProvider = new SsoLiteAccessTokenAuthenticationProvider(
 				this.ssoLiteClientProperties.getTokenApiUrl(), this.restTemplateBuilder.build(),
-				this.userDetailsService);
+				auth.getDefaultUserDetailsService());
 		auth.authenticationProvider(ssoProvider);
-
-		// local authentication provider.
-		DaoAuthenticationProvider localProvider = new DaoAuthenticationProvider();
-		localProvider.setUserDetailsService(this.userDetailsService);
-		auth.authenticationProvider(localProvider);
 	}
 
 	@Override

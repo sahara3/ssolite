@@ -10,33 +10,7 @@ logging:
       security: DEBUG
     com.github.sahara3: DEBUG
 
-# Spring settings.
-spring:
-  datasource:
-    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=TRUE
-    driver-class-name: org.h2.Driver
-    username: sa
-
-  session:
-    store-type: hash-map
-
-# Database settings.
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-    default-fetch-size: 100
-    default-statement-timeout: 30
-
-flyway:
-  enabled: false
-  baseline-on-migrate: true
-  baseline-version: 0
-
-# Security settings.
-security:
-  basic:
-    enabled: false
-
+# SSOLite settings.
 ssolite:
   server:
     enabled: true

@@ -9,10 +9,8 @@
     <h1>SSOLite - Client Application Page (Spring)</h1>
     <p>This page requires authentication.</p>
 
-    <form method="POST" action="/logout">
+    <form th:action="@{/logout}" method="POST">
       <input type="submit" value="Local Logout" />
-      <p>FIXME: Move to SSO login page after logout?</p>
-      <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
     </form>
   </body>
 </html>

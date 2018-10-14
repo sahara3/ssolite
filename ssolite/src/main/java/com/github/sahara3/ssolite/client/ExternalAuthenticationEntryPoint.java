@@ -1,7 +1,6 @@
 package com.github.sahara3.ssolite.client;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
@@ -82,14 +81,8 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 
 		// append "from".
 		if (from != null) {
-			try {
-				String encoded = UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8.name());
-				redirectUrl += "?from=" + encoded;
-			}
-			catch (UnsupportedEncodingException e) {
-				// NOTE: thrown only if "UTF-8" is not supported.
-				throw new RuntimeException(e);
-			}
+			String encoded = UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8.name());
+			redirectUrl += "?from=" + encoded;
 		}
 
 		LOG.debug("Redirect URL: {}", redirectUrl);
