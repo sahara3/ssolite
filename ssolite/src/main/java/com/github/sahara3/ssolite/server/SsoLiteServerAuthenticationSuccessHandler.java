@@ -57,6 +57,7 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
 
 		if (from != null) {
 			String target = this.redirectResolver.getRedirectDestination(from, authentication);
+
 			this.clearAuthenticationAttributes(request);
 
 			this.logger.debug("Redirect URL: " + target);

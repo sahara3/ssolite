@@ -13,6 +13,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.github.sahara3.ssolite.config.SsoLiteServerProperties;
+import com.github.sahara3.ssolite.server.SsoLiteServerAuthenticationFailureHandler;
 import com.github.sahara3.ssolite.server.SsoLiteServerAuthenticationSuccessHandler;
 import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 
@@ -66,29 +67,37 @@ public class WebSecurityConfig {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
+			// success handler.
 			SsoLiteServerAuthenticationSuccessHandler successHandler;
 			successHandler = new SsoLiteServerAuthenticationSuccessHandler(this.redirectResolver);
 			successHandler.setDefaultTopPageUrl(this.ssoServerProperties.getDefaultTopPageUrl());
 			successHandler.setPermittedDomainMap(this.ssoServerProperties.getPermittedDomainMap());
 
+			// failure handler.
+			SsoLiteServerAuthenticationFailureHandler failureHandler;
+			failureHandler = new SsoLiteServerAuthenticationFailureHandler("/login?error");
+
 			// @formatter:off
 			http.authorizeRequests()
+				.regexMatchers("/login\\?.*").permitAll()
 				.anyRequest().authenticated()
 				.and()
 			.formLogin()
 				.loginPage("/login")
 				.successHandler(successHandler)
+				.failureHandler(failureHandler)
 				.permitAll()
 				.and()
 			.logout()
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout", RequestMethod.GET.name()))
-				.logoutSuccessUrl("/login?logout");
+				.logoutSuccessUrl("/login?logout")
+				.permitAll();
 			// @formatter:on
 		}
 
 		@Override
 		public void configure(WebSecurity web) throws Exception {
-			web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**");
+			web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
 		}
 
 		@Override

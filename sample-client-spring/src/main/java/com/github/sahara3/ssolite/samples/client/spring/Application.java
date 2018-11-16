@@ -11,7 +11,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
  * @author sahara3
  */
 @SpringBootApplication
-// @EnableTransactionManagement
 public class Application extends SpringBootServletInitializer {
 
 	@Override

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.util.UrlUtils;
@@ -50,16 +51,20 @@ public class SsoLiteServerRedirectResolver {
 	 * @param authentication
 	 *            the authentication token when logged in.
 	 * @return the redirect URL.
+	 * @throws AccessDeniedException
+	 *             thrown if the domain where the request came from is not
+	 *             permitted.
 	 */
-	public String getRedirectDestination(@NonNull String from, @NonNull Authentication authentication) {
+	public String getRedirectDestination(@NonNull String from, @NonNull Authentication authentication)
+			throws AccessDeniedException {
 		if (!UrlUtils.isAbsoluteUrl(from)) {
 			return from;
 		}
 
 		URI destination = this.getSsoRedirectDestinationUri(from);
 		if (destination == null) {
-			// TODO: Throws some new exception represents HTTP 403.
-			throw new RuntimeException("Not permitted domain: " + from);
+			LOG.debug("{} is not permitted domain, so throws AccessDenied.", from);
+			throw new AccessDeniedException("Not permitted domain: " + from);
 		}
 
 		String target = destination.toASCIIString();
@@ -105,6 +110,6 @@ public class SsoLiteServerRedirectResolver {
 	}
 
 	private static String encodeQueryParam(@NonNull String value) {
-		return UriUtils.encodeQueryParam(value, StandardCharsets.UTF_8.name());
+		return UriUtils.encodeQueryParam(value, StandardCharsets.UTF_8);
 	}
 }

@@ -50,7 +50,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.permitAll()
 				.and()
 			.logout()
-				.logoutUrl("/logout");
+				.logoutUrl("/logout")
+				.permitAll();
 		// @formatter:on
 
 		http.apply(new SsoLiteClientLoginConfigurer("/sso-login"));
@@ -71,6 +72,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**");
+		web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
 	}
 }

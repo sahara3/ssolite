@@ -11,6 +11,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+/**
+ * Web MVC controller for the client.
+ *
+ * @author sahara3
+ */
 @Controller
 public class WebMvcController {
 
@@ -47,6 +52,9 @@ public class WebMvcController {
 		return "login";
 	}
 
+	/**
+	 * @return &quot;index&quot; for the index page.
+	 */
 	@GetMapping(path = "/")
 	@SuppressWarnings("static-method")
 	public String index() {
