@@ -1,7 +1,5 @@
 package com.github.sahara3.ssolite.client;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,8 +10,7 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-
-import lombok.NonNull;
+import org.springframework.util.Assert;
 
 /**
  * Configures SSOLite client authentication.
@@ -22,18 +19,16 @@ import lombok.NonNull;
  */
 public class SsoLiteClientLoginConfigurer extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
-	@NotNull
 	private final SsoLiteAccessTokenAuthenticationProcessingFilter authenticationFilter;
 
 	/**
 	 * Creates a new SSOLIte client authentication configurator.
 	 *
 	 * @param filterProcessesUrl
-	 *            the URL where a
-	 *            {@link SsoLiteAccessTokenAuthenticationProcessingFilter}
-	 *            works.
+	 *            the URL where a {@link SsoLiteAccessTokenAuthenticationProcessingFilter} works.
 	 */
-	public SsoLiteClientLoginConfigurer(@NonNull String filterProcessesUrl) {
+	public SsoLiteClientLoginConfigurer(String filterProcessesUrl) {
+		Assert.notNull(filterProcessesUrl, "filterProcessesUrl cannot be null");
 		this.authenticationFilter = new SsoLiteAccessTokenAuthenticationProcessingFilter(filterProcessesUrl);
 		this.successHandler = new SsoLiteClientAuthenticationSuccessHandler();
 		this.failureHandler = new SimpleUrlAuthenticationFailureHandler();

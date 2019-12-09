@@ -25,10 +25,10 @@ allprojects {
     dependencyManagement {
         imports {
             mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
-	}
+        }
 
         dependencies {
-            dependency 'org.projectlombok:lombok:1.16.20'
+            dependency 'org.projectlombok:lombok:1.18.10'
 
             dependency 'javax.servlet:javax.servlet-api:3.1.0'
             dependency 'javax.validation:validation-api:2.0.0.Final'
@@ -58,68 +58,10 @@ subprojects { subproject ->
                                      '-parameters']
         }
 
-        task delombok(type: JavaExec, dependsOn: compileJava) {
-            ext.outputDir = file("${buildDir}/delombok")
-            outputs.dir outputDir
-
-            classpath configurations.compile, configurations.compileOnly
-            main = 'lombok.launch.Main'
-            args 'delombok'
-            sourceSets.main.java.srcDirs.each {
-                inputs.dir it
-                args it, '-d', outputDir
-            }
-        }
-
         tasks.withType(Javadoc) {
-            dependsOn delombok
-            source = delombok.outputDir
-
             options.encoding = encoding
             options.charSet = encoding
-            //options.links 'http://docs.oracle.com/javase/8/docs/api/'
-        }
-    }
-
-    plugins.withId('eclipse') {
-        eclipse {
-            project {
-                name = path.substring(1).replaceAll(':', '-')
-                natures 'org.eclipse.buildship.core.gradleprojectnature'
-                buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
-            }
-
-            classpath {
-                downloadSources = true
-                downloadJavadoc = true
-
-                file {
-                    whenMerged { classpath ->
-                        classpath.entries.findAll { it.kind == 'lib' }*.exported = true
-                    }
-                }
-            }
-        }
-
-        tasks.eclipse {
-            dependsOn cleanEclipse
-            doLast {
-                def settings_dir = file('.settings')
-                if (settings_dir.exists()) {
-                    def project_dir = (['..'] * project.depth).join('/')
-                    file("${settings_dir}/org.eclipse.buildship.core.prefs").append("""
-                        connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
-                        connection.project.dir=${project_dir}
-                        eclipse.preferences.version=1
-                    """.stripIndent())
-                }
-            }
-        }
-
-        tasks.cleanEclipse {
-            doLast {
-                delete '.settings'
-            }
+            // options.links 'http://docs.oracle.com/javase/8/docs/api/'
         }
 
         tasks.clean {
@@ -128,22 +70,39 @@ subprojects { subproject ->
             }
         }
     }
+
+    plugins.withId('eclipse') {
+        eclipse {
+            project {
+                name = path.substring(1).replaceAll(':', '-')
+            }
+
+            classpath {
+                downloadSources = true
+                downloadJavadoc = true
+            }
+        }
+
+        tasks.cleanEclipse.doLast {
+            delete '.settings'
+        }
+    }
 }
 
 // ===================================================================
 //  ssolite
 // ===================================================================
-project(':ssolite') {
+def mainProjects = subprojects.findAll { it.path.startsWith(':ssolite') }
+
+configure(mainProjects) {
     group = 'com.github.sahara3'
-    version = '0.0.5'
+    version = '1.0.0-SNAPSHOT'
 
     apply plugin: 'java'
-    apply plugin: 'maven'
     apply plugin: 'eclipse'
 
     dependencies {
         compileOnly 'javax.servlet:javax.servlet-api'
-        compile 'javax.validation:validation-api'
         compile 'org.springframework:spring-web'
         compile 'org.springframework.security:spring-security-web'
         compile 'org.springframework.security:spring-security-config'
@@ -162,6 +121,8 @@ project(':ssolite') {
     // ---------------------------------------------------------------
     // Maven Publising
     // ---------------------------------------------------------------
+    apply plugin: 'maven'
+
     configurations {
         deployerJars
     }
@@ -180,7 +141,7 @@ project(':ssolite') {
         }
     }
 
-    task sourcesJar(type: Jar, dependsOn:classes) {
+    task sourceJar(type: Jar, dependsOn:classes) {
         classifier = 'sources'
         from sourceSets.main.allSource
     }
@@ -191,7 +152,7 @@ project(':ssolite') {
     }
 
     artifacts {
-        archives sourcesJar
+        archives sourceJar
         archives javadocJar
     }
 }
@@ -199,14 +160,43 @@ project(':ssolite') {
 // ===================================================================
 //  Sample Server and Client
 // ===================================================================
-project(':sample-server') {
+def sampleProjects = subprojects.findAll { it.path.startsWith(':sample') }
+
+configure(sampleProjects) {
     apply plugin: 'java'
     apply plugin: 'eclipse'
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+
+        compile 'javax.validation:validation-api'
+        compile project(':ssolite')
+    }
+
+    task delombok(type: JavaExec, dependsOn: compileJava) {
+        ext.outputDir = file("${buildDir}/delombok")
+        outputs.dir outputDir
+
+        classpath configurations.compile, configurations.compileOnly
+        main = 'lombok.launch.Main'
+        args 'delombok'
+        sourceSets.main.java.srcDirs.each {
+            inputs.dir it
+            args it, '-d', outputDir
+        }
+    }
+
+    tasks.withType(Javadoc) {
+        dependsOn delombok
+        source = delombok.outputDir
+    }
+}
+
+project(':sample-server') {
     apply plugin: 'org.springframework.boot'
 
     dependencies {
-        compile project(':ssolite')
-        compile 'javax.validation:validation-api'
         compile 'org.springframework.boot:spring-boot-starter-web'
         compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
         compile 'org.springframework.boot:spring-boot-starter-security'
@@ -217,13 +207,9 @@ project(':sample-server') {
 }
 
 project(':sample-client-spring') {
-    apply plugin: 'java'
-    apply plugin: 'eclipse'
     apply plugin: 'org.springframework.boot'
 
     dependencies {
-        compile project(':ssolite')
-        compile 'javax.validation:validation-api'
         compile 'org.springframework.boot:spring-boot-starter-web'
         compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
         compile 'org.springframework.boot:spring-boot-starter-security'
@@ -233,16 +219,12 @@ project(':sample-client-spring') {
 }
 
 project(':sample-client-struts2') {
-    apply plugin: 'java'
     apply plugin: 'war'
-    apply plugin: 'eclipse'
     apply plugin: 'org.akhikhl.gretty'
 
     dependencies {
         compileOnly 'javax.servlet:javax.servlet-api'
 
-        compile project(':ssolite')
-        compile 'javax.validation:validation-api'
         compile 'org.apache.struts:struts2-core'
         compile 'com.squareup.okhttp3:okhttp'
         compile 'com.fasterxml.jackson.core:jackson-databind'

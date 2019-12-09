@@ -4,27 +4,31 @@ import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
-
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
 import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepository;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 /**
  * Implementation of {@link SsoLiteAccessTokenService} interface.
  *
  * @author sahara3
  */
-@RequiredArgsConstructor
 public class SsoLiteAccessTokenServiceImpl implements SsoLiteAccessTokenService {
 
-	@NotNull
 	private final SsoLiteAccessTokenRepository accessTokenRepository;
 
+	public SsoLiteAccessTokenServiceImpl(SsoLiteAccessTokenRepository accessTokenRepository) {
+		Assert.notNull(accessTokenRepository, "accessTokenRepository cannot be null");
+		this.accessTokenRepository = accessTokenRepository;
+	}
+
 	@Override
-	public SsoLiteAccessToken findValidAccessToken(@NonNull String tokenId) {
+	@Nullable
+	public SsoLiteAccessToken findValidAccessToken(String tokenId) {
+		Assert.notNull(tokenId, "tokenId cannot be null");
+
 		SsoLiteAccessToken token = this.accessTokenRepository.findById(tokenId);
 		if (token != null) {
 			Date now = new Date();
@@ -38,7 +42,9 @@ public class SsoLiteAccessTokenServiceImpl implements SsoLiteAccessTokenService 
 	}
 
 	@Override
-	public SsoLiteAccessToken createAccessToken(@NonNull String username) {
+	public SsoLiteAccessToken createAccessToken(String username) {
+		Assert.notNull(username, "username cannot be null");
+
 		String id = UUID.randomUUID().toString();
 		Date expired = Date.from(OffsetDateTime.now().plusSeconds(30).toInstant());
 		SsoLiteAccessToken token = new SsoLiteAccessToken(id, username, expired);

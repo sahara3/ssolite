@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,27 +18,24 @@ import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriUtils;
 
-import lombok.NonNull;
-
 /**
  * Authentication failure handler for SSOLite server.
  *
  * @author sahara3
  */
 public class SsoLiteServerAuthenticationFailureHandler implements AuthenticationFailureHandler {
+
 	protected final Log logger = LogFactory.getLog(this.getClass());
 
-	@NotNull
 	private final String forwardUrl;
 
-	@NotNull
 	private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
 	/**
 	 * @param forwardUrl
 	 *            URL to forward when login failure.
 	 */
-	public SsoLiteServerAuthenticationFailureHandler(@NonNull String forwardUrl) {
+	public SsoLiteServerAuthenticationFailureHandler(String forwardUrl) {
 		Assert.isTrue(UrlUtils.isValidRedirectUrl(forwardUrl), "'" + forwardUrl + "' is not a valid forward URL");
 		this.forwardUrl = forwardUrl;
 	}

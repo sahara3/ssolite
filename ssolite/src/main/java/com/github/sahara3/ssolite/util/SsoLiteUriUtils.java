@@ -3,7 +3,7 @@ package com.github.sahara3.ssolite.util;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import lombok.NonNull;
+import org.springframework.util.Assert;
 
 /**
  * URI utilities for SSOLIte.
@@ -19,7 +19,9 @@ public class SsoLiteUriUtils {
 	 *            the original URI.
 	 * @return the domain URI.
 	 */
-	public static URI getDomainUri(@NonNull URI uri) {
+	public static URI getDomainUri(URI uri) {
+		Assert.notNull(uri, "uri cannot be null.");
+
 		try {
 			return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 		}

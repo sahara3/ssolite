@@ -6,18 +6,17 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
+import org.springframework.util.Assert;
 import org.springframework.web.util.UriUtils;
 
 import com.github.sahara3.ssolite.util.SsoLiteRedirectUrlBuilder;
-
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link AuthenticationEntryPoint} implementation that redirects to an external
@@ -25,10 +24,10 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author sahara3
  */
-@Slf4j
 public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-	@NotNull
+	private static final Logger LOG = LoggerFactory.getLogger(ExternalAuthenticationEntryPoint.class);
+
 	private final String loginFormUrl;
 
 	private final boolean sameDomain;
@@ -43,7 +42,8 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 	 * @param sameDomain
 	 *            set true if the {@code loginFormUrl} is on the same domain.
 	 */
-	public ExternalAuthenticationEntryPoint(@NonNull String loginFormUrl, boolean sameDomain) {
+	public ExternalAuthenticationEntryPoint(String loginFormUrl, boolean sameDomain) {
+		Assert.notNull(loginFormUrl, "loginFormUrl cannot be null");
 		this.loginFormUrl = loginFormUrl;
 		this.sameDomain = sameDomain;
 	}
@@ -59,7 +59,7 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 	 * @param loginFormUrl
 	 *            the URL of login form.
 	 */
-	public ExternalAuthenticationEntryPoint(@NonNull String loginFormUrl) {
+	public ExternalAuthenticationEntryPoint(String loginFormUrl) {
 		this(loginFormUrl, false);
 	}
 
@@ -68,12 +68,14 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 	@Override
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
-
 		String url = this.buildRedirectUrl(request, this.loginFormUrl);
 		this.redirectStrategy.sendRedirect(request, response, url);
 	}
 
-	private String buildRedirectUrl(@NonNull HttpServletRequest request, @NonNull String url) {
+	private String buildRedirectUrl(HttpServletRequest request, String url) {
+		Assert.notNull(request, "request cannot be null");
+		Assert.notNull(url, "url cannot be null");
+
 		String from = this.generateFromUrl(request);
 		LOG.debug("buildRedirectUrl: url={}, from={}", url, from);
 
@@ -89,7 +91,9 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
 		return redirectUrl;
 	}
 
-	private String generateFromUrl(@NonNull HttpServletRequest request) {
+	private String generateFromUrl(HttpServletRequest request) {
+		Assert.notNull(request, "request cannot be null");
+
 		if (this.sameDomain) {
 			String from = request.getRequestURI();
 			String query = request.getQueryString();

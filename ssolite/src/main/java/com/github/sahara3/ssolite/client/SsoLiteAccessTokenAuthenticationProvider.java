@@ -1,5 +1,7 @@
 package com.github.sahara3.ssolite.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -19,34 +21,38 @@ import org.springframework.web.client.RestTemplate;
 
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Authentication provider for SSOLite client.
  *
  * @author sahara3
  *
  */
-@Slf4j
 public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationProvider {
+
+	private static final Logger LOG = LoggerFactory.getLogger(SsoLiteAccessTokenAuthenticationProvider.class);
 
 	@Override
 	public boolean supports(Class<?> authentication) {
 		return SsoLiteAccessTokenAuthenticationToken.class.isAssignableFrom(authentication);
 	}
 
-	@Getter
 	private final String accessTokenApiUrl;
 
-	@Getter(AccessLevel.PROTECTED)
+	public String getAccessTokenApiUrl() {
+		return this.accessTokenApiUrl;
+	}
+
 	private final RestTemplate restTemplate;
 
-	@Getter(AccessLevel.PROTECTED)
+	protected RestTemplate getRestTemplate() {
+		return this.restTemplate;
+	}
+
 	private final UserDetailsService userDetailsService;
+
+	protected UserDetailsService getUserDetailsService() {
+		return this.userDetailsService;
+	}
 
 	/**
 	 * @param accessTokenApiUrl
@@ -56,20 +62,37 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
 	 * @param userDetailsService
 	 *            Your {@link UserDetailsService} implementation.
 	 */
-	public SsoLiteAccessTokenAuthenticationProvider(@NonNull String accessTokenApiUrl,
-			@NonNull RestTemplate restTemplate, @NonNull UserDetailsService userDetailsService) {
+	public SsoLiteAccessTokenAuthenticationProvider(String accessTokenApiUrl, RestTemplate restTemplate,
+			UserDetailsService userDetailsService) {
+		Assert.notNull(accessTokenApiUrl, "accessTokenApiUrl cannot be null");
+		Assert.notNull(restTemplate, "restTemplate cannot be null");
+		Assert.notNull(userDetailsService, "userDetailsService cannot be null");
+
 		this.accessTokenApiUrl = accessTokenApiUrl;
 		this.restTemplate = restTemplate;
 		this.userDetailsService = userDetailsService;
 	}
 
-	@Getter(AccessLevel.PROTECTED)
-	@Setter
 	private UserDetailsChecker authenticationChecks = new DefaultAuthenticationChecks();
 
-	@Getter(AccessLevel.PROTECTED)
-	@Setter
+	protected UserDetailsChecker getAuthenticationChecks() {
+		return this.authenticationChecks;
+	}
+
+	public void setAuthenticationChecks(UserDetailsChecker authenticationChecks) {
+		Assert.notNull(authenticationChecks, "authenticationChecks cannot be null");
+		this.authenticationChecks = authenticationChecks;
+	}
+
 	private boolean hideUserNotFoundExceptions = false;
+
+	protected boolean isHideUserNotFoundExceptions() {
+		return this.hideUserNotFoundExceptions;
+	}
+
+	public void setHideUserNotFoundExceptions(boolean hideUserNotFoundExceptions) {
+		this.hideUserNotFoundExceptions = hideUserNotFoundExceptions;
+	}
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
