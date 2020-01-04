@@ -7,8 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
-import lombok.NonNull;
-
 /**
  * Authentication processing filter for SSOLite client.
  *
@@ -20,7 +18,7 @@ public class SsoLiteAccessTokenAuthenticationProcessingFilter extends AbstractAu
 	 * @param filterProcessesUrl
 	 *            the default filter processing URL.
 	 */
-	public SsoLiteAccessTokenAuthenticationProcessingFilter(@NonNull String filterProcessesUrl) {
+	public SsoLiteAccessTokenAuthenticationProcessingFilter(String filterProcessesUrl) {
 		super(filterProcessesUrl);
 	}
 

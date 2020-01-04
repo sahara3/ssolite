@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
@@ -18,31 +17,47 @@ import org.springframework.util.StringUtils;
 import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 import com.github.sahara3.ssolite.util.SsoLiteRedirectUrlBuilder;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-
 /**
  * Authentication success handler for SSOLite server.
  *
  * @author sahara3
  */
-@RequiredArgsConstructor
 public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-	@NotNull
 	protected final SsoLiteServerRedirectResolver redirectResolver;
 
-	@NotNull
-	@Getter
-	@Setter
+	public SsoLiteServerAuthenticationSuccessHandler(SsoLiteServerRedirectResolver redirectResolver) {
+		this.redirectResolver = redirectResolver;
+	}
+
 	protected String defaultTopPageUrl;
 
-	@NotNull
-	@Setter
+	/**
+	 * @return the default top page URL
+	 */
+	public String getDefaultTopPageUrl() {
+		return defaultTopPageUrl;
+	}
+
+	/**
+	 * @param defaultTopPageUrl
+	 *            the default top page URL to set
+	 */
+	public void setDefaultTopPageUrl(String defaultTopPageUrl) {
+		Assert.notNull(defaultTopPageUrl, "defaultTopPageUrl cannot be null");
+		this.defaultTopPageUrl = defaultTopPageUrl;
+	}
+
 	protected Map<URI, URI> permittedDomainMap = new HashMap<>();
+
+	/**
+	 * @param permittedDomainMap
+	 *            the permitted domain map to set
+	 */
+	public void setPermittedDomainMap(Map<URI, URI> permittedDomainMap) {
+		Assert.notNull(permittedDomainMap, "permittedDomainMap cannot be null");
+		this.permittedDomainMap = permittedDomainMap;
+	}
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -68,7 +83,6 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
 			// internal redirection.
 			super.onAuthenticationSuccess(request, response, authentication);
 		}
-		return;
 	}
 
 	// ========================================================================
@@ -77,8 +91,11 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
 
 	private final SsoLiteRedirectUrlBuilder redirectUrlBuilder = new SsoLiteRedirectUrlBuilder();
 
-	@Getter(AccessLevel.PROTECTED)
 	private boolean useReferer = false;
+
+	protected boolean isUseReferer() {
+		return this.useReferer;
+	}
 
 	@Override
 	public void setUseReferer(boolean useReferer) {
@@ -87,7 +104,7 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
 	}
 
 	@Override
-	protected String determineTargetUrl(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response) {
+	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
 		if (this.isAlwaysUseDefaultTargetUrl()) {
 			return this.determineDefaultTargetUrl(request);
 		}
@@ -118,7 +135,9 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
 		return target;
 	}
 
-	protected String determineDefaultTargetUrl(@NonNull HttpServletRequest request) {
+	protected String determineDefaultTargetUrl(HttpServletRequest request) {
+		Assert.notNull(request, "request cannot be null");
+
 		String top = this.getDefaultTopPageUrl();
 		return this.redirectUrlBuilder.buildRedirectUrl(request, top);
 	}

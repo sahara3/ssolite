@@ -4,9 +4,10 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import javax.validation.constraints.NotNull;
-
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
+
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
 
 /**
  * In-memory implementation of {@link SsoLiteAccessTokenRepository} interface.
@@ -18,20 +19,24 @@ public class SsoLiteAccessTokenRepositoryImpl implements SsoLiteAccessTokenRepos
 	private final ConcurrentMap<String, SsoLiteAccessToken> tokens = new ConcurrentHashMap<>();
 
 	@Override
-	public SsoLiteAccessToken findById(@NotNull String id) {
+	@Nullable
+	public SsoLiteAccessToken findById(String id) {
+		Assert.notNull(id, "id cannot be null");
 		SsoLiteAccessToken token = this.tokens.get(id);
 		return token;
 	}
 
 	@Override
-	public void save(@NotNull SsoLiteAccessToken token) {
+	public void save(SsoLiteAccessToken token) {
+		Assert.notNull(token, "token cannot be null");
 		this.tokens.put(token.getId(), token);
 
 		this.cleanupExpiredTokens();
 	}
 
 	@Override
-	public void delete(@NotNull String id) {
+	public void delete(String id) {
+		Assert.notNull(id, "id cannot be null");
 		this.tokens.remove(id);
 
 		this.cleanupExpiredTokens();

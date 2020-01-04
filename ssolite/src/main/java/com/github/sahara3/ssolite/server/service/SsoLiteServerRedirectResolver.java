@@ -6,8 +6,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotNull;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,11 +19,6 @@ import org.springframework.web.util.UriUtils;
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
 import com.github.sahara3.ssolite.util.SsoLiteUriUtils;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * SSOLite redirect resolver.
  *
@@ -32,16 +27,23 @@ import lombok.extern.slf4j.Slf4j;
  * @author sahara3
  */
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class SsoLiteServerRedirectResolver {
 
-	@NotNull
+	private static final Logger LOG = LoggerFactory.getLogger(SsoLiteServerRedirectResolver.class);
+
 	protected final SsoLiteAccessTokenService tokenService;
 
-	@NotNull
-	@Setter
+	public SsoLiteServerRedirectResolver(SsoLiteAccessTokenService tokenService) {
+		Assert.notNull(tokenService, "tokenService cannot be null");
+		this.tokenService = tokenService;
+	}
+
 	protected Map<URI, URI> permittedDomainMap = new HashMap<>();
+
+	public void setPermittedDomainMap(Map<URI, URI> permittedDomainMap) {
+		Assert.notNull(permittedDomainMap, "permittedDomainMap cannot be null");
+		this.permittedDomainMap = permittedDomainMap;
+	}
 
 	/**
 	 * Resolves and returns the redirect URL after login.
@@ -55,8 +57,10 @@ public class SsoLiteServerRedirectResolver {
 	 *             thrown if the domain where the request came from is not
 	 *             permitted.
 	 */
-	public String getRedirectDestination(@NonNull String from, @NonNull Authentication authentication)
-			throws AccessDeniedException {
+	public String getRedirectDestination(String from, Authentication authentication) throws AccessDeniedException {
+		Assert.notNull(from, "from cannot be null");
+		Assert.notNull(authentication, "authentication cannot be null");
+
 		if (!UrlUtils.isAbsoluteUrl(from)) {
 			return from;
 		}
@@ -97,7 +101,9 @@ public class SsoLiteServerRedirectResolver {
 		return builder.toString();
 	}
 
-	protected URI getSsoRedirectDestinationUri(@NonNull String from) {
+	protected URI getSsoRedirectDestinationUri(String from) {
+		Assert.notNull(from, "from cannot be null");
+
 		// TODO: support a domain that have multiple applications (sso-login).
 		try {
 			URI uri = new URI(from);
@@ -109,7 +115,8 @@ public class SsoLiteServerRedirectResolver {
 		}
 	}
 
-	private static String encodeQueryParam(@NonNull String value) {
+	private static String encodeQueryParam(String value) {
+		Assert.notNull(value, "value cannot be null");
 		return UriUtils.encodeQueryParam(value, StandardCharsets.UTF_8);
 	}
 }

@@ -1,8 +1,8 @@
 package com.github.sahara3.ssolite.server.repository;
 
-import javax.validation.constraints.NotNull;
-
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Repository interface of SSOLite access tokens.
@@ -18,7 +18,8 @@ public interface SsoLiteAccessTokenRepository {
 	 *            must not be null.
 	 * @return the access token with the given ID, or null if not found.
 	 */
-	SsoLiteAccessToken findById(@NotNull String id);
+	@Nullable
+	SsoLiteAccessToken findById(String id);
 
 	/**
 	 * Saves a given access token.
@@ -26,7 +27,7 @@ public interface SsoLiteAccessTokenRepository {
 	 * @param token
 	 *            must not be null.
 	 */
-	void save(@NotNull SsoLiteAccessToken token);
+	void save(SsoLiteAccessToken token);
 
 	/**
 	 * Deletes an access token by its ID.
@@ -34,6 +35,6 @@ public interface SsoLiteAccessTokenRepository {
 	 * @param id
 	 *            must not be null.
 	 */
-	void delete(@NotNull String id);
+	void delete(String id);
 
 }

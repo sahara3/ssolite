@@ -7,14 +7,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.util.Assert;
 
 import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepository;
 import com.github.sahara3.ssolite.server.repository.SsoLiteAccessTokenRepositoryImpl;
 import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenService;
 import com.github.sahara3.ssolite.server.service.SsoLiteAccessTokenServiceImpl;
 import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
-
-import lombok.NonNull;
 
 /**
  * Server auto configuration for SSOLite.
@@ -25,6 +24,7 @@ import lombok.NonNull;
 @ConditionalOnClass(EnableWebSecurity.class)
 @ConditionalOnProperty(prefix = "ssolite.server", name = "enabled", havingValue = "true", matchIfMissing = false)
 @EnableConfigurationProperties(SsoLiteServerProperties.class)
+@SuppressWarnings("static-method")
 public class SsoLiteServerAutoConfiguration {
 
 	/**
@@ -34,7 +34,6 @@ public class SsoLiteServerAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean(SsoLiteAccessTokenRepository.class)
-	@SuppressWarnings("static-method")
 	public SsoLiteAccessTokenRepository ssoAccessTokenRepository() {
 		return new SsoLiteAccessTokenRepositoryImpl();
 	}
@@ -48,9 +47,9 @@ public class SsoLiteServerAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean(SsoLiteAccessTokenService.class)
-	@SuppressWarnings("static-method")
 	public SsoLiteAccessTokenService ssoAccessTokenService(
-			@NonNull SsoLiteAccessTokenRepository ssoLiteAccessTokenRepository) {
+			SsoLiteAccessTokenRepository ssoLiteAccessTokenRepository) {
+		Assert.notNull(ssoLiteAccessTokenRepository, "ssoLiteAccessTokenRepository cannot be null");
 		return new SsoLiteAccessTokenServiceImpl(ssoLiteAccessTokenRepository);
 	}
 
@@ -65,10 +64,11 @@ public class SsoLiteServerAutoConfiguration {
 	 */
 	@Bean
 	@ConditionalOnMissingBean(SsoLiteServerRedirectResolver.class)
-	@SuppressWarnings("static-method")
 	public SsoLiteServerRedirectResolver ssoLiteServerRedirectResolver(
-			@NonNull SsoLiteAccessTokenService ssoLiteAccessTokenService,
-			@NonNull SsoLiteServerProperties ssoLiteServerProperties) {
+			SsoLiteAccessTokenService ssoLiteAccessTokenService,
+			SsoLiteServerProperties ssoLiteServerProperties) {
+		Assert.notNull(ssoLiteAccessTokenService, "ssoLiteAccessTokenService cannot be null");
+		Assert.notNull(ssoLiteServerProperties, "ssoLiteServerProperties cannot be null");
 		SsoLiteServerRedirectResolver resolver = new SsoLiteServerRedirectResolver(ssoLiteAccessTokenService);
 		resolver.setPermittedDomainMap(ssoLiteServerProperties.getPermittedDomainMap());
 		return resolver;

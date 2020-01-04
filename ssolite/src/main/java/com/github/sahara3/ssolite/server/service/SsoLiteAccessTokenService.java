@@ -1,8 +1,8 @@
 package com.github.sahara3.ssolite.server.service;
 
-import javax.validation.constraints.NotNull;
-
 import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
+
+import org.springframework.lang.Nullable;
 
 /**
  * Service interface of SSOLite access tokens.
@@ -20,7 +20,8 @@ public interface SsoLiteAccessTokenService {
 	 *            the access token ID.
 	 * @return the access token, or null if there is no valid token.
 	 */
-	SsoLiteAccessToken findValidAccessToken(@NotNull String tokenId);
+	@Nullable
+	SsoLiteAccessToken findValidAccessToken(String tokenId);
 
 	/**
 	 * Creates a new access token for the user.
@@ -29,7 +30,6 @@ public interface SsoLiteAccessTokenService {
 	 *            the user name.
 	 * @return the newly created access token.
 	 */
-	@NotNull
-	SsoLiteAccessToken createAccessToken(@NotNull String username);
+	SsoLiteAccessToken createAccessToken(String username);
 
 }
