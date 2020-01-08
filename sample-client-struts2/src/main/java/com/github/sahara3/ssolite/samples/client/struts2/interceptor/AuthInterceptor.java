@@ -16,55 +16,55 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthInterceptor extends AbstractInterceptor {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private static final String SESSION_KEY_SAVEDREQUEST = "my-saved-request";
+    private static final String SESSION_KEY_SAVEDREQUEST = "my-saved-request";
 
-	private final AuthManager authenticationManager = AuthManager.getInstance();
+    private final AuthManager authenticationManager = AuthManager.getInstance();
 
-	@Override
-	public String intercept(ActionInvocation invocation) throws Exception {
-		LOG.trace("Intercepting.");
-		HttpServletRequest request = ServletActionContext.getRequest();
+    @Override
+    public String intercept(ActionInvocation invocation) throws Exception {
+        LOG.trace("Intercepting.");
+        HttpServletRequest request = ServletActionContext.getRequest();
 
-		// get or create a new session to record the request URL.
-		HttpSession session = request.getSession(true);
+        // get or create a new session to record the request URL.
+        HttpSession session = request.getSession(true);
 
-		// record access URI into the session.
-		setRequestURL(request, session);
+        // record access URI into the session.
+        setRequestURL(request, session);
 
-		// check whether logged in status.
-		AuthToken token = this.authenticationManager.getAuthenticationToken(session);
-		if (token == null) {
-			LOG.trace("Need login.");
-			return "need.login";
-		}
+        // check whether logged in status.
+        AuthToken token = this.authenticationManager.getAuthenticationToken(session);
+        if (token == null) {
+            LOG.trace("Need login.");
+            return "need.login";
+        }
 
-		// user has logged in.
-		LOG.trace("User has been logged in.");
-		return invocation.invoke();
-	}
+        // user has logged in.
+        LOG.trace("User has been logged in.");
+        return invocation.invoke();
+    }
 
-	public static String getSavedRequestURL(HttpSession session) {
-		if (session == null) {
-			return null;
-		}
+    public static String getSavedRequestURL(HttpSession session) {
+        if (session == null) {
+            return null;
+        }
 
-		Object saved = session.getAttribute(SESSION_KEY_SAVEDREQUEST);
-		return saved instanceof String ? (String) saved : null;
-	}
+        Object saved = session.getAttribute(SESSION_KEY_SAVEDREQUEST);
+        return saved instanceof String ? (String) saved : null;
+    }
 
-	protected static void setRequestURL(@NonNull HttpServletRequest request, @NonNull HttpSession session) {
-		if (!"GET".equals(request.getMethod())) {
-			return;
-		}
+    protected static void setRequestURL(@NonNull HttpServletRequest request, @NonNull HttpSession session) {
+        if (!"GET".equals(request.getMethod())) {
+            return;
+        }
 
-		String uri = request.getRequestURI();
-		String query = request.getQueryString();
-		if (query != null && !query.isEmpty()) {
-			uri += "?" + query;
-		}
+        String uri = request.getRequestURI();
+        String query = request.getQueryString();
+        if (query != null && !query.isEmpty()) {
+            uri += "?" + query;
+        }
 
-		session.setAttribute(SESSION_KEY_SAVEDREQUEST, uri);
-	}
+        session.setAttribute(SESSION_KEY_SAVEDREQUEST, uri);
+    }
 }

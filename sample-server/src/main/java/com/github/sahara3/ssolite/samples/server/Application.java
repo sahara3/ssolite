@@ -17,31 +17,31 @@ import org.springframework.session.web.http.DefaultCookieSerializer;
 // @EnableTransactionManagement
 public class Application extends SpringBootServletInitializer {
 
-	@Override
-	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-		return application.sources(Application.class);
-	}
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Application.class);
+    }
 
-	/**
-	 * Entry point.
-	 *
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    /**
+     * Entry point.
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
-	/**
-	 * {@code CookieSerializer} bean.
-	 *
-	 * @return the {@code CookieSerializer} bean.
-	 */
-	@Bean
-	@SuppressWarnings("static-method")
-	public CookieSerializer cookieSerializer() {
-		DefaultCookieSerializer serializer = new DefaultCookieSerializer();
-		serializer.setCookieName("SESSIONID");
-		serializer.setUseHttpOnlyCookie(true);
-		return serializer;
-	}
+    /**
+     * {@code CookieSerializer} bean.
+     *
+     * @return the {@code CookieSerializer} bean.
+     */
+    @Bean
+    @SuppressWarnings("static-method")
+    public CookieSerializer cookieSerializer() {
+        DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+        serializer.setCookieName("SESSIONID");
+        serializer.setUseHttpOnlyCookie(true);
+        return serializer;
+    }
 }

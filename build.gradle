@@ -42,36 +42,40 @@ allprojects {
 
 subprojects { subproject ->
     plugins.withId('java') {
+        subproject.apply plugin: 'eclipse'
+
         dependencies {
             compileOnly 'org.projectlombok:lombok'
             testCompileOnly 'org.projectlombok:lombok'
         }
 
-        def encoding = 'UTF-8'
+
+        ext {
+            javaEncoding = 'UTF-8'
+            eclipseFormatterXml = file("${rootDir}/eclipse/formatter.xml")
+        }
 
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
 
         tasks.withType(AbstractCompile) {
-            options.encoding = encoding
+            options.encoding = javaEncoding
             options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-Xlint:-fallthrough',
                                      '-parameters']
         }
 
         tasks.withType(Javadoc) {
-            options.encoding = encoding
-            options.charSet = encoding
-            // options.links 'http://docs.oracle.com/javase/8/docs/api/'
+            options.encoding = javaEncoding
+            options.charSet = javaEncoding
+            options.links 'http://docs.oracle.com/javase/8/docs/api/'
         }
 
         tasks.clean {
             doLast {
-                delete 'bin'
+                project.delete 'bin'
             }
         }
-    }
 
-    plugins.withId('eclipse') {
         eclipse {
             project {
                 name = path.substring(1).replaceAll(':', '-')
@@ -81,10 +85,60 @@ subprojects { subproject ->
                 downloadSources = true
                 downloadJavadoc = true
             }
+
+            jdt {
+                file {
+                    withProperties { properties ->
+                        def profiles = new XmlSlurper().parse(eclipseFormatterXml)
+                        profiles.profile.setting.each { setting ->
+                            properties.setProperty("${setting.@id}", "${setting.@value}")
+                        }
+                    }
+                }
+            }
+        }
+
+        tasks.eclipse.doLast {
+            def settingsDir = project.file('.settings')
+            if (!settingsDir.exists()) {
+                return
+            }
+
+            def update = { name, params ->
+                def properties = new Properties()
+                def settingFile = project.file("${settingsDir}/${name}")
+                if (settingFile.exists()) {
+                    settingFile.withReader { r -> properties.load(r) }
+                }
+                else {
+                    properties.setProperty('eclipse.preferences.version', '1')
+                }
+
+                params.each { k, v ->
+                    properties.setProperty(k, v)
+                }
+                settingFile.withWriter { w -> properties.store(w, '') }
+            }
+
+            update('org.eclipse.core.runtime.prefs', [
+                'line.separator': '\\n',
+            ])
+            update('org.eclipse.core.resources.prefs', [
+                'encoding/<project>': javaEncoding,
+            ])
+
+            def profiles = new XmlSlurper().parse(eclipseFormatterXml)
+            update('org.eclipse.jdt.ui.prefs', [
+                'formatter_settings_version': "${profiles.profile.@version}",
+                'org.eclipse.jdt.ui.ignorelowercasenames': 'true',
+                'org.eclipse.jdt.ui.importorder': 'java;javax;org;com;',
+                'org.eclipse.jdt.ui.ondemandthreshold': '99',
+                'org.eclipse.jdt.ui.staticondemandthreshold': '99',
+            ])
         }
 
         tasks.cleanEclipse.doLast {
-            delete '.settings'
+            project.delete '.settings', '.classpath', '.project'
         }
     }
 }

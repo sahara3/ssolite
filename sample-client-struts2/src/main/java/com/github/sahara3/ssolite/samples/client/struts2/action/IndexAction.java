@@ -4,10 +4,10 @@ import com.opensymphony.xwork2.ActionSupport;
 
 public class IndexAction extends ActionSupport {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@SuppressWarnings("static-method")
-	public String show() {
-		return SUCCESS;
-	}
+    @SuppressWarnings("static-method")
+    public String show() {
+        return SUCCESS;
+    }
 }

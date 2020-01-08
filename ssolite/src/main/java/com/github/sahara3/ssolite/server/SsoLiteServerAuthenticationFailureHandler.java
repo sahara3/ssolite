@@ -25,49 +25,48 @@ import org.springframework.web.util.UriUtils;
  */
 public class SsoLiteServerAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-	protected final Log logger = LogFactory.getLog(this.getClass());
+    protected final Log logger = LogFactory.getLog(this.getClass());
 
-	private final String forwardUrl;
+    private final String forwardUrl;
 
-	private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
-	/**
-	 * @param forwardUrl
-	 *            URL to forward when login failure.
-	 */
-	public SsoLiteServerAuthenticationFailureHandler(String forwardUrl) {
-		Assert.isTrue(UrlUtils.isValidRedirectUrl(forwardUrl), "'" + forwardUrl + "' is not a valid forward URL");
-		this.forwardUrl = forwardUrl;
-	}
+    /**
+     * @param forwardUrl URL to forward when login failure.
+     */
+    public SsoLiteServerAuthenticationFailureHandler(String forwardUrl) {
+        Assert.isTrue(UrlUtils.isValidRedirectUrl(forwardUrl), "'" + forwardUrl + "' is not a valid forward URL");
+        this.forwardUrl = forwardUrl;
+    }
 
-	@Override
-	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-			AuthenticationException exception) throws IOException, ServletException {
-		String url = this.forwardUrl;
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+            AuthenticationException exception) throws IOException, ServletException {
+        String url = this.forwardUrl;
 
-		String from = request.getParameter("from"); // can be null.
-		this.logger.debug("onAuthenticationSuccess: from=" + from);
+        String from = request.getParameter("from"); // can be null.
+        this.logger.debug("onAuthenticationSuccess: from=" + from);
 
-		if (from != null) {
-			String query = "from=" + UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8);
-			if (this.forwardUrl.contains("?")) {
-				if (this.forwardUrl.endsWith("?")) {
-					url += query;
-				}
-				else {
-					url += "&" + query;
-				}
-			}
-			else {
-				url += "?" + query;
-			}
-		}
+        if (from != null) {
+            String query = "from=" + UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8);
+            if (this.forwardUrl.contains("?")) {
+                if (this.forwardUrl.endsWith("?")) {
+                    url += query;
+                }
+                else {
+                    url += "&" + query;
+                }
+            }
+            else {
+                url += "?" + query;
+            }
+        }
 
-		request.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
+        request.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
 
-		this.logger.debug("Redirect URL: " + url);
-		Assert.notNull(url, "Redirect URL cannot be null.");
-		this.redirectStrategy.sendRedirect(request, response, url);
-	}
+        this.logger.debug("Redirect URL: " + url);
+        Assert.notNull(url, "Redirect URL cannot be null.");
+        this.redirectStrategy.sendRedirect(request, response, url);
+    }
 
 }

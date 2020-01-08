@@ -12,13 +12,13 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class LocalUser implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String name;
+    private String name;
 
-	private String password;
+    private String password;
 
-	public static LocalUser copy(@NonNull LocalUser from) {
-		return new LocalUser(from.name, from.password);
-	}
+    public static LocalUser copy(@NonNull LocalUser from) {
+        return new LocalUser(from.name, from.password);
+    }
 }

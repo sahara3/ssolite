@@ -16,56 +16,56 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SsoLiteEntryPointAction extends ActionSupport implements ServletRequestAware {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Setter
-	private HttpServletRequest servletRequest;
+    @Setter
+    private HttpServletRequest servletRequest;
 
-	@Getter
-	private String redirectUrl;
+    @Getter
+    private String redirectUrl;
 
-	private final SsoLiteRedirectUrlBuilder urlBuilder = new SsoLiteRedirectUrlBuilder();
+    private final SsoLiteRedirectUrlBuilder urlBuilder = new SsoLiteRedirectUrlBuilder();
 
-	@Override
-	public String execute() throws Exception {
-		String loginUrl = this.getText("ssolite.client.login-url");
-		boolean sameDomain = Boolean.getBoolean(this.getText("ssolite.same-domain"));
-		this.redirectUrl = this.buildRedirectUrl(loginUrl, sameDomain);
-		return "redirect";
-	}
+    @Override
+    public String execute() throws Exception {
+        String loginUrl = this.getText("ssolite.client.login-url");
+        boolean sameDomain = Boolean.getBoolean(this.getText("ssolite.same-domain"));
+        this.redirectUrl = this.buildRedirectUrl(loginUrl, sameDomain);
+        return "redirect";
+    }
 
-	private String buildRedirectUrl(@NonNull String loginUrl, boolean sameDomain) {
-		String from = this.generateFromUrl(sameDomain);
-		LOG.debug("buildRedirectUrl: url={}, from={}", loginUrl, from);
+    private String buildRedirectUrl(@NonNull String loginUrl, boolean sameDomain) {
+        String from = this.generateFromUrl(sameDomain);
+        LOG.debug("buildRedirectUrl: url={}, from={}", loginUrl, from);
 
-		this.redirectUrl = this.urlBuilder.buildRedirectUrl(this.servletRequest, loginUrl);
+        this.redirectUrl = this.urlBuilder.buildRedirectUrl(this.servletRequest, loginUrl);
 
-		// append "from".
-		if (from != null) {
-			String encoded = UriUtils.encodeQueryParam(from, "utf-8");
-			this.redirectUrl += "?from=" + encoded;
-		}
+        // append "from".
+        if (from != null) {
+            String encoded = UriUtils.encodeQueryParam(from, "utf-8");
+            this.redirectUrl += "?from=" + encoded;
+        }
 
-		LOG.debug("Redirect URL: {}", this.redirectUrl);
-		return this.redirectUrl;
-	}
+        LOG.debug("Redirect URL: {}", this.redirectUrl);
+        return this.redirectUrl;
+    }
 
-	private String generateFromUrl(boolean sameDomain) {
-		if (sameDomain) {
-			String from = this.servletRequest.getRequestURI();
-			String query = this.servletRequest.getQueryString();
-			if (query != null) {
-				from += "?" + query;
-			}
-			return from;
-		}
+    private String generateFromUrl(boolean sameDomain) {
+        if (sameDomain) {
+            String from = this.servletRequest.getRequestURI();
+            String query = this.servletRequest.getQueryString();
+            if (query != null) {
+                from += "?" + query;
+            }
+            return from;
+        }
 
-		// not a same domain.
-		StringBuffer from = this.servletRequest.getRequestURL();
-		String query = this.servletRequest.getQueryString();
-		if (query != null) {
-			from.append('?').append(query);
-		}
-		return from.toString();
-	}
+        // not a same domain.
+        StringBuffer from = this.servletRequest.getRequestURL();
+        String query = this.servletRequest.getQueryString();
+        if (query != null) {
+            from.append('?').append(query);
+        }
+        return from.toString();
+    }
 }

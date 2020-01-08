@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthToken implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String username;
+    private String username;
 
-	private String password;
+    private String password;
 
-	private boolean authenticated;
+    private boolean authenticated;
 }

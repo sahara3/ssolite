@@ -24,121 +24,119 @@ import com.github.sahara3.ssolite.util.SsoLiteRedirectUrlBuilder;
  */
 public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-	protected final SsoLiteServerRedirectResolver redirectResolver;
+    protected final SsoLiteServerRedirectResolver redirectResolver;
 
-	public SsoLiteServerAuthenticationSuccessHandler(SsoLiteServerRedirectResolver redirectResolver) {
-		this.redirectResolver = redirectResolver;
-	}
+    public SsoLiteServerAuthenticationSuccessHandler(SsoLiteServerRedirectResolver redirectResolver) {
+        this.redirectResolver = redirectResolver;
+    }
 
-	protected String defaultTopPageUrl;
+    protected String defaultTopPageUrl;
 
-	/**
-	 * @return the default top page URL
-	 */
-	public String getDefaultTopPageUrl() {
-		return defaultTopPageUrl;
-	}
+    /**
+     * @return the default top page URL
+     */
+    public String getDefaultTopPageUrl() {
+        return this.defaultTopPageUrl;
+    }
 
-	/**
-	 * @param defaultTopPageUrl
-	 *            the default top page URL to set
-	 */
-	public void setDefaultTopPageUrl(String defaultTopPageUrl) {
-		Assert.notNull(defaultTopPageUrl, "defaultTopPageUrl cannot be null");
-		this.defaultTopPageUrl = defaultTopPageUrl;
-	}
+    /**
+     * @param defaultTopPageUrl the default top page URL to set
+     */
+    public void setDefaultTopPageUrl(String defaultTopPageUrl) {
+        Assert.notNull(defaultTopPageUrl, "defaultTopPageUrl cannot be null");
+        this.defaultTopPageUrl = defaultTopPageUrl;
+    }
 
-	protected Map<URI, URI> permittedDomainMap = new HashMap<>();
+    protected Map<URI, URI> permittedDomainMap = new HashMap<>();
 
-	/**
-	 * @param permittedDomainMap
-	 *            the permitted domain map to set
-	 */
-	public void setPermittedDomainMap(Map<URI, URI> permittedDomainMap) {
-		Assert.notNull(permittedDomainMap, "permittedDomainMap cannot be null");
-		this.permittedDomainMap = permittedDomainMap;
-	}
+    /**
+     * @param permittedDomainMap the permitted domain map to set
+     */
+    public void setPermittedDomainMap(Map<URI, URI> permittedDomainMap) {
+        Assert.notNull(permittedDomainMap, "permittedDomainMap cannot be null");
+        this.permittedDomainMap = permittedDomainMap;
+    }
 
-	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws ServletException, IOException {
-		if (this.isAlwaysUseDefaultTargetUrl()) {
-			super.onAuthenticationSuccess(request, response, authentication);
-			return;
-		}
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws ServletException, IOException {
+        if (this.isAlwaysUseDefaultTargetUrl()) {
+            super.onAuthenticationSuccess(request, response, authentication);
+            return;
+        }
 
-		String from = request.getParameter("from"); // can be null.
-		this.logger.debug("onAuthenticationSuccess: from=" + from);
+        String from = request.getParameter("from"); // can be null.
+        this.logger.debug("onAuthenticationSuccess: from=" + from);
 
-		if (from != null) {
-			String target = this.redirectResolver.getRedirectDestination(from, authentication);
+        if (from != null) {
+            String target = this.redirectResolver.getRedirectDestination(from, authentication);
 
-			this.clearAuthenticationAttributes(request);
+            this.clearAuthenticationAttributes(request);
 
-			this.logger.debug("Redirect URL: " + target);
-			Assert.notNull(target, "Redirect URL cannot be null.");
-			this.getRedirectStrategy().sendRedirect(request, response, target);
-		}
-		else {
-			// internal redirection.
-			super.onAuthenticationSuccess(request, response, authentication);
-		}
-	}
+            this.logger.debug("Redirect URL: " + target);
+            Assert.notNull(target, "Redirect URL cannot be null.");
+            this.getRedirectStrategy().sendRedirect(request, response, target);
+        }
+        else {
+            // internal redirection.
+            super.onAuthenticationSuccess(request, response, authentication);
+        }
+    }
 
-	// ========================================================================
-	// for internal success handler
-	// ========================================================================
+    // ========================================================================
+    // for internal success handler
+    // ========================================================================
 
-	private final SsoLiteRedirectUrlBuilder redirectUrlBuilder = new SsoLiteRedirectUrlBuilder();
+    private final SsoLiteRedirectUrlBuilder redirectUrlBuilder = new SsoLiteRedirectUrlBuilder();
 
-	private boolean useReferer = false;
+    private boolean useReferer = false;
 
-	protected boolean isUseReferer() {
-		return this.useReferer;
-	}
+    protected boolean isUseReferer() {
+        return this.useReferer;
+    }
 
-	@Override
-	public void setUseReferer(boolean useReferer) {
-		super.setUseReferer(useReferer);
-		this.useReferer = useReferer;
-	}
+    @Override
+    public void setUseReferer(boolean useReferer) {
+        super.setUseReferer(useReferer);
+        this.useReferer = useReferer;
+    }
 
-	@Override
-	protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
-		if (this.isAlwaysUseDefaultTargetUrl()) {
-			return this.determineDefaultTargetUrl(request);
-		}
+    @Override
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response) {
+        if (this.isAlwaysUseDefaultTargetUrl()) {
+            return this.determineDefaultTargetUrl(request);
+        }
 
-		// Check for the parameter and use that if available
-		String target = null;
+        // Check for the parameter and use that if available
+        String target = null;
 
-		if (this.getTargetUrlParameter() != null) {
-			target = request.getParameter(this.getTargetUrlParameter());
+        if (this.getTargetUrlParameter() != null) {
+            target = request.getParameter(this.getTargetUrlParameter());
 
-			if (StringUtils.hasText(target)) {
-				this.logger.debug("Found targetUrlParameter in request: " + target);
+            if (StringUtils.hasText(target)) {
+                this.logger.debug("Found targetUrlParameter in request: " + target);
 
-				return target;
-			}
-		}
+                return target;
+            }
+        }
 
-		if (this.isUseReferer() && !StringUtils.hasLength(target)) {
-			target = request.getHeader("Referer");
-			this.logger.debug("Using Referer header: " + target);
-		}
+        if (this.isUseReferer() && !StringUtils.hasLength(target)) {
+            target = request.getHeader("Referer");
+            this.logger.debug("Using Referer header: " + target);
+        }
 
-		if (!StringUtils.hasText(target)) {
-			target = this.determineDefaultTargetUrl(request);
-			this.logger.debug("Using default Url: " + target);
-		}
+        if (!StringUtils.hasText(target)) {
+            target = this.determineDefaultTargetUrl(request);
+            this.logger.debug("Using default Url: " + target);
+        }
 
-		return target;
-	}
+        return target;
+    }
 
-	protected String determineDefaultTargetUrl(HttpServletRequest request) {
-		Assert.notNull(request, "request cannot be null");
+    protected String determineDefaultTargetUrl(HttpServletRequest request) {
+        Assert.notNull(request, "request cannot be null");
 
-		String top = this.getDefaultTopPageUrl();
-		return this.redirectUrlBuilder.buildRedirectUrl(request, top);
-	}
+        String top = this.getDefaultTopPageUrl();
+        return this.redirectUrlBuilder.buildRedirectUrl(request, top);
+    }
 }

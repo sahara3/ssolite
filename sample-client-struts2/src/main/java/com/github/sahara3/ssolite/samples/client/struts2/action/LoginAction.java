@@ -10,30 +10,30 @@ import lombok.Setter;
 
 public class LoginAction extends AbstractLoginAction {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public String show() {
-		HttpSession session = this.getServletRequest().getSession(false);
-		if (this.getAuthManager().getAuthenticationToken(session) != null) {
-			return "redirect.default";
-		}
+    public String show() {
+        HttpSession session = this.getServletRequest().getSession(false);
+        if (this.getAuthManager().getAuthenticationToken(session) != null) {
+            return "redirect.default";
+        }
 
-		return SUCCESS;
-	}
+        return SUCCESS;
+    }
 
-	@Setter
-	private String username;
+    @Setter
+    private String username;
 
-	@Setter
-	private String password;
+    @Setter
+    private String password;
 
-	@Override
-	protected AuthToken authenticate() throws AuthException {
-		return this.getAuthManager().authenticate(this.getServletRequest(), this.username, this.password);
-	}
+    @Override
+    protected AuthToken authenticate() throws AuthException {
+        return this.getAuthManager().authenticate(this.getServletRequest(), this.username, this.password);
+    }
 
-	@Override
-	protected String determineRedirectUrl(HttpSession session) {
-		return AuthInterceptor.getSavedRequestURL(session);
-	}
+    @Override
+    protected String determineRedirectUrl(HttpSession session) {
+        return AuthInterceptor.getSavedRequestURL(session);
+    }
 }

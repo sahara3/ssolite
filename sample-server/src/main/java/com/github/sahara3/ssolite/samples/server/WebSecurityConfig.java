@@ -26,84 +26,84 @@ import com.github.sahara3.ssolite.server.service.SsoLiteServerRedirectResolver;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-	/**
-	 * Security configuration for RESTful API of SSO access token.
-	 *
-	 * @author sahara3
-	 */
-	@Configuration
-	@Order(1)
-	public static class SsoLiteAccessTokenApiSecurityConfig extends WebSecurityConfigurerAdapter {
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			String urlPattern = "/api/tokens/**";
+    /**
+     * Security configuration for RESTful API of SSO access token.
+     *
+     * @author sahara3
+     */
+    @Configuration
+    @Order(1)
+    public static class SsoLiteAccessTokenApiSecurityConfig extends WebSecurityConfigurerAdapter {
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            String urlPattern = "/api/tokens/**";
 
-			http.csrf().ignoringAntMatchers(urlPattern);
+            http.csrf().ignoringAntMatchers(urlPattern);
 
-			// @formatter:off
-			http.antMatcher(urlPattern)
-				.sessionManagement()
-					.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-					.and()
-				.authorizeRequests()
-					.anyRequest().permitAll();
-			// @formatter:on
-		}
-	}
+            // @formatter:off
+            http.antMatcher(urlPattern)
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                .authorizeRequests()
+                .anyRequest().permitAll();
+            // @formatter:on
+        }
+    }
 
-	/**
-	 * Security configuration for the form login.
-	 *
-	 * @author sahara3
-	 */
-	@Configuration
-	@Order(2)
-	public static class FormLoginSecurityConfig extends WebSecurityConfigurerAdapter {
-		@Autowired
-		private SsoLiteServerProperties ssoServerProperties;
+    /**
+     * Security configuration for the form login.
+     *
+     * @author sahara3
+     */
+    @Configuration
+    @Order(2)
+    public static class FormLoginSecurityConfig extends WebSecurityConfigurerAdapter {
+        @Autowired
+        private SsoLiteServerProperties ssoServerProperties;
 
-		@Autowired
-		private SsoLiteServerRedirectResolver redirectResolver;
+        @Autowired
+        private SsoLiteServerRedirectResolver redirectResolver;
 
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			// success handler.
-			SsoLiteServerAuthenticationSuccessHandler successHandler;
-			successHandler = new SsoLiteServerAuthenticationSuccessHandler(this.redirectResolver);
-			successHandler.setDefaultTopPageUrl(this.ssoServerProperties.getDefaultTopPageUrl());
-			successHandler.setPermittedDomainMap(this.ssoServerProperties.getPermittedDomainMap());
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            // success handler.
+            SsoLiteServerAuthenticationSuccessHandler successHandler;
+            successHandler = new SsoLiteServerAuthenticationSuccessHandler(this.redirectResolver);
+            successHandler.setDefaultTopPageUrl(this.ssoServerProperties.getDefaultTopPageUrl());
+            successHandler.setPermittedDomainMap(this.ssoServerProperties.getPermittedDomainMap());
 
-			// failure handler.
-			SsoLiteServerAuthenticationFailureHandler failureHandler;
-			failureHandler = new SsoLiteServerAuthenticationFailureHandler("/login?error");
+            // failure handler.
+            SsoLiteServerAuthenticationFailureHandler failureHandler;
+            failureHandler = new SsoLiteServerAuthenticationFailureHandler("/login?error");
 
-			// @formatter:off
-			http.authorizeRequests()
-				.regexMatchers("/login\\?.*").permitAll()
-				.anyRequest().authenticated()
-				.and()
-			.formLogin()
-				.loginPage("/login")
-				.successHandler(successHandler)
-				.failureHandler(failureHandler)
-				.permitAll()
-				.and()
-			.logout()
-				.logoutRequestMatcher(new AntPathRequestMatcher("/logout", RequestMethod.GET.name()))
-				.logoutSuccessUrl("/login?logout")
-				.permitAll();
-			// @formatter:on
-		}
+            // @formatter:off
+            http.authorizeRequests()
+                .regexMatchers("/login\\?.*").permitAll()
+                .anyRequest().authenticated()
+                .and()
+            .formLogin()
+                .loginPage("/login")
+                .successHandler(successHandler)
+                .failureHandler(failureHandler)
+                .permitAll()
+                .and()
+            .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", RequestMethod.GET.name()))
+                .logoutSuccessUrl("/login?logout")
+                .permitAll();
+            // @formatter:on
+        }
 
-		@Override
-		public void configure(WebSecurity web) throws Exception {
-			web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
-		}
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
+        }
 
-		@Override
-		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-			// TODO: You should implement more secure UserDetailsService.
-			auth.inMemoryAuthentication().withUser("admin").password("{noop}admin").roles("ADMIN");
-		}
-	}
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            // TODO: You should implement more secure UserDetailsService.
+            auth.inMemoryAuthentication().withUser("admin").password("{noop}admin").roles("ADMIN");
+        }
+    }
 }

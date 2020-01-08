@@ -1,0 +1,14 @@
+{
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "java.format.settings.url": "eclipse/formatter.xml",
+    "java.completion.importOrder": [
+        "java",
+        "javax",
+        "org",
+        "com",
+        "",
+        "#"
+    ],
+    "java.import.gradle.enabled": false
+}

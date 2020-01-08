@@ -14,5 +14,5 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @ConditionalOnClass(EnableWebSecurity.class)
 @EnableConfigurationProperties(SsoLiteClientProperties.class)
 public class SsoLiteClientAutoConfiguration {
-	// no additional configurations.
+    // no additional configurations.
 }

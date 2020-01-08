@@ -24,54 +24,54 @@ import com.github.sahara3.ssolite.config.SsoLiteClientProperties;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	private RestTemplateBuilder restTemplateBuilder;
+    @Autowired
+    private RestTemplateBuilder restTemplateBuilder;
 
-	@Autowired
-	private SsoLiteClientProperties ssoLiteClientProperties;
+    @Autowired
+    private SsoLiteClientProperties ssoLiteClientProperties;
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		// entry point for authentication failure.
-		AuthenticationEntryPoint entryPoint = new ExternalAuthenticationEntryPoint(
-				this.ssoLiteClientProperties.getLoginUrl(), this.ssoLiteClientProperties.isSameDomain());
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        // entry point for authentication failure.
+        AuthenticationEntryPoint entryPoint = new ExternalAuthenticationEntryPoint(
+                this.ssoLiteClientProperties.getLoginUrl(), this.ssoLiteClientProperties.isSameDomain());
 
-		// @formatter:off
-		http
-			.exceptionHandling()
-				.authenticationEntryPoint(entryPoint)
-				.and()
-			.authorizeRequests()
-				.antMatchers("/sso-login").permitAll()
-				.anyRequest().authenticated()
-				.and()
-			.formLogin()
-				.loginPage("/login")
-				.permitAll()
-				.and()
-			.logout()
-				.logoutUrl("/logout")
-				.permitAll();
-		// @formatter:on
+        // @formatter:off
+        http
+            .exceptionHandling()
+                .authenticationEntryPoint(entryPoint)
+                .and()
+            .authorizeRequests()
+                .antMatchers("/sso-login").permitAll()
+                .anyRequest().authenticated()
+                .and()
+            .formLogin()
+                .loginPage("/login")
+                .permitAll()
+                .and()
+            .logout()
+                .logoutUrl("/logout")
+                .permitAll();
+        // @formatter:on
 
-		http.apply(new SsoLiteClientLoginConfigurer("/sso-login"));
-	}
+        http.apply(new SsoLiteClientLoginConfigurer("/sso-login"));
+    }
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// local authentication provider.
-		// TODO: You should implement more secure UserDetailsService.
-		auth.inMemoryAuthentication().withUser("admin").password("{noop}spring").roles("ADMIN");
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // local authentication provider.
+        // TODO: You should implement more secure UserDetailsService.
+        auth.inMemoryAuthentication().withUser("admin").password("{noop}spring").roles("ADMIN");
 
-		// SSOLite authentication provider.
-		SsoLiteAccessTokenAuthenticationProvider ssoProvider = new SsoLiteAccessTokenAuthenticationProvider(
-				this.ssoLiteClientProperties.getTokenApiUrl(), this.restTemplateBuilder.build(),
-				auth.getDefaultUserDetailsService());
-		auth.authenticationProvider(ssoProvider);
-	}
+        // SSOLite authentication provider.
+        SsoLiteAccessTokenAuthenticationProvider ssoProvider =
+                new SsoLiteAccessTokenAuthenticationProvider(this.ssoLiteClientProperties.getTokenApiUrl(),
+                        this.restTemplateBuilder.build(), auth.getDefaultUserDetailsService());
+        auth.authenticationProvider(ssoProvider);
+    }
 
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
-	}
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/favicon.ico");
+    }
 }

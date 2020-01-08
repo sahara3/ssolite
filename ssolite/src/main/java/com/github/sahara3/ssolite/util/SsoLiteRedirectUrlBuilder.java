@@ -18,46 +18,44 @@ import org.springframework.util.Assert;
  */
 public class SsoLiteRedirectUrlBuilder {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SsoLiteRedirectUrlBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SsoLiteRedirectUrlBuilder.class);
 
-	private final PortResolver portResolver = new PortResolverImpl();
+    private final PortResolver portResolver = new PortResolverImpl();
 
-	/**
-	 * Builds redirect URL and return it.
-	 *
-	 * @param request
-	 *            the request object.
-	 * @param url
-	 *            the URL to redirect.
-	 * @return the redirect URL.
-	 */
-	public String buildRedirectUrl(HttpServletRequest request, @NonNull String url) {
-		Assert.notNull(request, "request cannot be null");
-		Assert.notNull(url, "url cannot be null");
+    /**
+     * Builds redirect URL and return it.
+     *
+     * @param request the request object.
+     * @param url     the URL to redirect.
+     * @return the redirect URL.
+     */
+    public String buildRedirectUrl(HttpServletRequest request, @NonNull String url) {
+        Assert.notNull(request, "request cannot be null");
+        Assert.notNull(url, "url cannot be null");
 
-		if (UrlUtils.isAbsoluteUrl(url)) {
-			LOG.debug("URL is absolute: {}", url);
-			return url;
-		}
+        if (UrlUtils.isAbsoluteUrl(url)) {
+            LOG.debug("URL is absolute: {}", url);
+            return url;
+        }
 
-		boolean internal = false;
-		String path = url;
-		if (url.startsWith("internal:")) {
-			path = url.substring("internal:".length());
-			internal = true;
-		}
+        boolean internal = false;
+        String path = url;
+        if (url.startsWith("internal:")) {
+            path = url.substring("internal:".length());
+            internal = true;
+        }
 
-		RedirectUrlBuilder builder = new RedirectUrlBuilder();
-		builder.setScheme(request.getScheme());
-		builder.setServerName(request.getServerName());
-		builder.setPort(this.portResolver.getServerPort(request));
-		if (internal) {
-			builder.setContextPath(request.getContextPath());
-		}
-		builder.setPathInfo(path);
+        RedirectUrlBuilder builder = new RedirectUrlBuilder();
+        builder.setScheme(request.getScheme());
+        builder.setServerName(request.getServerName());
+        builder.setPort(this.portResolver.getServerPort(request));
+        if (internal) {
+            builder.setContextPath(request.getContextPath());
+        }
+        builder.setPathInfo(path);
 
-		String redirectUrl = builder.getUrl();
-		LOG.debug("Redirect URL: {}", redirectUrl);
-		return redirectUrl;
-	}
+        String redirectUrl = builder.getUrl();
+        LOG.debug("Redirect URL: {}", redirectUrl);
+        return redirectUrl;
+    }
 }

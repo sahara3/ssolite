@@ -11,19 +11,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SessionCookieConfigurer implements ServletContextListener {
 
-	public static final String COOKIE_NAME = "SESSIONID";
+    public static final String COOKIE_NAME = "SESSIONID";
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
-		LOG.debug("Context initialized: event = {}", sce);
-		SessionCookieConfig cookieConfig = sce.getServletContext().getSessionCookieConfig();
-		cookieConfig.setName(COOKIE_NAME);
-		cookieConfig.setHttpOnly(true);
-	}
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
+        LOG.debug("Context initialized: event = {}", sce);
+        SessionCookieConfig cookieConfig = sce.getServletContext().getSessionCookieConfig();
+        cookieConfig.setName(COOKIE_NAME);
+        cookieConfig.setHttpOnly(true);
+    }
 
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		LOG.debug("Context destroyed: event = {}", sce);
-		// nothing to do.
-	}
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        LOG.debug("Context destroyed: event = {}", sce);
+        // nothing to do.
+    }
 }

@@ -14,20 +14,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogoutAction extends ActionSupport implements ServletRequestAware {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Setter
-	private HttpServletRequest servletRequest;
+    @Setter
+    private HttpServletRequest servletRequest;
 
-	AuthManager authenticationManager = AuthManager.getInstance();
+    AuthManager authenticationManager = AuthManager.getInstance();
 
-	@Override
-	public String execute() {
-		LOG.debug("Executing...");
+    @Override
+    public String execute() {
+        LOG.debug("Executing...");
 
-		HttpSession session = this.servletRequest.getSession(false);
-		this.authenticationManager.removeAuthenticationToken(session);
+        HttpSession session = this.servletRequest.getSession(false);
+        this.authenticationManager.removeAuthenticationToken(session);
 
-		return SUCCESS;
-	}
+        return SUCCESS;
+    }
 }

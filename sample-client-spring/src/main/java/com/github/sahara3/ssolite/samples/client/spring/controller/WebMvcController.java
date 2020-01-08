@@ -19,45 +19,41 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class WebMvcController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(WebMvcController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WebMvcController.class);
 
-	/**
-	 * Local login page.
-	 *
-	 * If an user has logged in, this method returns a redirect URL for the top
-	 * page.
-	 *
-	 * @param request
-	 *            must not be null.
-	 * @param authentication
-	 *            not null for logged in users.
-	 * @param model
-	 *            must not be null.
-	 * @return &quot;login&quot; for the login page, or redirect URL.
-	 */
-	@GetMapping(path = "/login")
-	@SuppressWarnings("static-method")
-	public String localLogin(HttpServletRequest request, Authentication authentication, Model model) {
-		if (authentication != null && authentication.isAuthenticated()) {
-			LOG.debug("Already logged in. Redirect to '/'");
-			return "redirect:/";
-		}
+    /**
+     * Local login page.
+     *
+     * If an user has logged in, this method returns a redirect URL for the top page.
+     *
+     * @param request        must not be null.
+     * @param authentication not null for logged in users.
+     * @param model          must not be null.
+     * @return &quot;login&quot; for the login page, or redirect URL.
+     */
+    @GetMapping(path = "/login")
+    @SuppressWarnings("static-method")
+    public String localLogin(HttpServletRequest request, Authentication authentication, Model model) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            LOG.debug("Already logged in. Redirect to '/'");
+            return "redirect:/";
+        }
 
-		// not logged in.
-		Arrays.asList("error", "logout").forEach(key -> model.addAttribute(key, request.getParameter(key)));
+        // not logged in.
+        Arrays.asList("error", "logout").forEach(key -> model.addAttribute(key, request.getParameter(key)));
 
-		String from = request.getParameter("from");
-		model.addAttribute("from", from);
+        String from = request.getParameter("from");
+        model.addAttribute("from", from);
 
-		return "login";
-	}
+        return "login";
+    }
 
-	/**
-	 * @return &quot;index&quot; for the index page.
-	 */
-	@GetMapping(path = "/")
-	@SuppressWarnings("static-method")
-	public String index() {
-		return "index";
-	}
+    /**
+     * @return &quot;index&quot; for the index page.
+     */
+    @GetMapping(path = "/")
+    @SuppressWarnings("static-method")
+    public String index() {
+        return "index";
+    }
 }

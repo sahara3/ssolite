@@ -20,8 +20,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * SSOLite server controller sample.
  *
- * In the login page, you should handle {@code from} parameter in the query
- * string.
+ * In the login page, you should handle {@code from} parameter in the query string.
  *
  * @author sahara3
  */
@@ -29,53 +28,49 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebMvcController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(WebMvcController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WebMvcController.class);
 
-	@NotNull
-	private final SsoLiteServerProperties ssoLiteServerProperties;
+    @NotNull
+    private final SsoLiteServerProperties ssoLiteServerProperties;
 
-	@NotNull
-	private final SsoLiteServerRedirectResolver redirectResolver;
+    @NotNull
+    private final SsoLiteServerRedirectResolver redirectResolver;
 
-	/**
-	 * Login page.
-	 *
-	 * If an user has logged in, this method returns a redirect URL for the top
-	 * page.
-	 *
-	 * @param request
-	 *            must not be null.
-	 * @param authentication
-	 *            not null for logged in users.
-	 * @param model
-	 *            must not be null.
-	 * @return &quot;login&quot; for the login page, or redirect URL.
-	 */
-	@GetMapping(path = "/login")
-	public String login(HttpServletRequest request, Authentication authentication, Model model) {
-		String from = request.getParameter("from");
+    /**
+     * Login page.
+     *
+     * If an user has logged in, this method returns a redirect URL for the top page.
+     *
+     * @param request        must not be null.
+     * @param authentication not null for logged in users.
+     * @param model          must not be null.
+     * @return &quot;login&quot; for the login page, or redirect URL.
+     */
+    @GetMapping(path = "/login")
+    public String login(HttpServletRequest request, Authentication authentication, Model model) {
+        String from = request.getParameter("from");
 
-		if (authentication != null && authentication.isAuthenticated() && from != null) {
-			String next = this.redirectResolver.getRedirectDestination(from, authentication);
-			LOG.debug("Already logged in. Redirect to {}", next);
-			return "redirect:" + next;
-		}
+        if (authentication != null && authentication.isAuthenticated() && from != null) {
+            String next = this.redirectResolver.getRedirectDestination(from, authentication);
+            LOG.debug("Already logged in. Redirect to {}", next);
+            return "redirect:" + next;
+        }
 
-		// not logged in.
-		Arrays.asList("error", "logout").forEach(key -> model.addAttribute(key, request.getParameter(key)));
-		model.addAttribute("from", from);
-		return "login";
-	}
+        // not logged in.
+        Arrays.asList("error", "logout").forEach(key -> model.addAttribute(key, request.getParameter(key)));
+        model.addAttribute("from", from);
+        return "login";
+    }
 
-	@GetMapping(path = "/")
-	@SuppressWarnings("static-method")
-	public String index() {
-		return "index";
-	}
+    @GetMapping(path = "/")
+    @SuppressWarnings("static-method")
+    public String index() {
+        return "index";
+    }
 
-	@GetMapping(path = "/page")
-	@SuppressWarnings("static-method")
-	public String page() {
-		return "page";
-	}
+    @GetMapping(path = "/page")
+    @SuppressWarnings("static-method")
+    public String page() {
+        return "page";
+    }
 }

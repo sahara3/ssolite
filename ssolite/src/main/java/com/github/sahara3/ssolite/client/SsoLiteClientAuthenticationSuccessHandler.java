@@ -16,18 +16,18 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
  */
 public class SsoLiteClientAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws IOException, ServletException {
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+            Authentication authentication) throws IOException, ServletException {
 
-		String next = request.getParameter("next");
-		if (next == null) {
-			super.onAuthenticationSuccess(request, response, authentication);
-			return;
-		}
+        String next = request.getParameter("next");
+        if (next == null) {
+            super.onAuthenticationSuccess(request, response, authentication);
+            return;
+        }
 
-		this.clearAuthenticationAttributes(request);
-		this.logger.debug("Redirect URL: " + next);
-		this.getRedirectStrategy().sendRedirect(request, response, next);
-	}
+        this.clearAuthenticationAttributes(request);
+        this.logger.debug("Redirect URL: " + next);
+        this.getRedirectStrategy().sendRedirect(request, response, next);
+    }
 }
