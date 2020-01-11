@@ -8,14 +8,14 @@ buildscript {
 
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.RELEASE'
-        classpath 'org.akhikhl.gretty:gretty:2.0.0'
+        classpath 'gradle.plugin.org.gretty:gretty:3.0.1'
     }
 }
 
 // ===================================================================
 //  Common Settings
 // ===================================================================
-allprojects {
+configure(allprojects) {
     repositories {
         mavenCentral()
     }
@@ -32,6 +32,7 @@ allprojects {
 
             dependency 'javax.servlet:javax.servlet-api:3.1.0'
             dependency 'javax.validation:validation-api:2.0.0.Final'
+            dependency 'com.google.code.findbugs:jsr305:3.0.2'
 
             dependency 'com.squareup.okhttp3:okhttp:3.10.0'
 
@@ -40,106 +41,99 @@ allprojects {
     }
 }
 
-subprojects { subproject ->
-    plugins.withId('java') {
-        subproject.apply plugin: 'eclipse'
+configure(subprojects) {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
 
-        dependencies {
-            compileOnly 'org.projectlombok:lombok'
-            testCompileOnly 'org.projectlombok:lombok'
+    ext {
+        javaEncoding = 'UTF-8'
+        eclipseFormatterXml = file("${rootDir}/eclipse/formatter.xml")
+    }
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    tasks.withType(AbstractCompile) {
+        options.encoding = javaEncoding
+        options.compilerArgs += [
+            '-Xlint:all', '-Xlint:-processing', '-Xlint:-fallthrough',
+            '-parameters'
+        ]
+    }
+
+    tasks.withType(Javadoc) {
+        options.encoding = javaEncoding
+        options.charSet = javaEncoding
+        options.links 'http://docs.oracle.com/javase/8/docs/api/'
+    }
+
+    tasks.clean.doLast {
+        project.delete 'bin'
+    }
+
+    eclipse {
+        project {
+            name = path.substring(1).replaceAll(':', '-')
         }
 
-
-        ext {
-            javaEncoding = 'UTF-8'
-            eclipseFormatterXml = file("${rootDir}/eclipse/formatter.xml")
+        classpath {
+            downloadSources = true
+            downloadJavadoc = true
         }
 
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-
-        tasks.withType(AbstractCompile) {
-            options.encoding = javaEncoding
-            options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-Xlint:-fallthrough',
-                                     '-parameters']
-        }
-
-        tasks.withType(Javadoc) {
-            options.encoding = javaEncoding
-            options.charSet = javaEncoding
-            options.links 'http://docs.oracle.com/javase/8/docs/api/'
-        }
-
-        tasks.clean {
-            doLast {
-                project.delete 'bin'
-            }
-        }
-
-        eclipse {
-            project {
-                name = path.substring(1).replaceAll(':', '-')
-            }
-
-            classpath {
-                downloadSources = true
-                downloadJavadoc = true
-            }
-
-            jdt {
-                file {
-                    withProperties { properties ->
-                        def profiles = new XmlSlurper().parse(eclipseFormatterXml)
-                        profiles.profile.setting.each { setting ->
-                            properties.setProperty("${setting.@id}", "${setting.@value}")
-                        }
+        jdt {
+            file {
+                withProperties { properties ->
+                    def profiles = new XmlSlurper().parse(eclipseFormatterXml)
+                    profiles.profile.setting.each { setting ->
+                        properties.setProperty("${setting.@id}", "${setting.@value}")
                     }
                 }
             }
         }
+    }
 
-        tasks.eclipse.doLast {
-            def settingsDir = project.file('.settings')
-            if (!settingsDir.exists()) {
-                return
-            }
-
-            def update = { name, params ->
-                def properties = new Properties()
-                def settingFile = project.file("${settingsDir}/${name}")
-                if (settingFile.exists()) {
-                    settingFile.withReader { r -> properties.load(r) }
-                }
-                else {
-                    properties.setProperty('eclipse.preferences.version', '1')
-                }
-
-                params.each { k, v ->
-                    properties.setProperty(k, v)
-                }
-                settingFile.withWriter { w -> properties.store(w, '') }
-            }
-
-            update('org.eclipse.core.runtime.prefs', [
-                'line.separator': '\\n',
-            ])
-            update('org.eclipse.core.resources.prefs', [
-                'encoding/<project>': javaEncoding,
-            ])
-
-            def profiles = new XmlSlurper().parse(eclipseFormatterXml)
-            update('org.eclipse.jdt.ui.prefs', [
-                'formatter_settings_version': "${profiles.profile.@version}",
-                'org.eclipse.jdt.ui.ignorelowercasenames': 'true',
-                'org.eclipse.jdt.ui.importorder': 'java;javax;org;com;',
-                'org.eclipse.jdt.ui.ondemandthreshold': '99',
-                'org.eclipse.jdt.ui.staticondemandthreshold': '99',
-            ])
+    tasks.eclipse.doLast {
+        def settingsDir = project.file('.settings')
+        if (!settingsDir.exists()) {
+            return
         }
 
-        tasks.cleanEclipse.doLast {
-            project.delete '.settings', '.classpath', '.project'
+        def update = { name, params ->
+            def properties = new Properties()
+            def settingFile = file("${settingsDir}/${name}")
+            if (settingFile.exists()) {
+                settingFile.withReader { r -> properties.load(r) }
+            }
+            else {
+                properties.setProperty('eclipse.preferences.version', '1')
+            }
+
+            params.each { k, v ->
+                properties.setProperty(k, v)
+            }
+            settingFile.withWriter { w -> properties.store(w, '') }
         }
+
+        update('org.eclipse.core.runtime.prefs', [
+            'line.separator': '\\n',
+        ])
+        update('org.eclipse.core.resources.prefs', [
+            'encoding/<project>': javaEncoding,
+        ])
+
+        def profiles = new XmlSlurper().parse(eclipseFormatterXml)
+        update('org.eclipse.jdt.ui.prefs', [
+            'formatter_settings_version': "${profiles.profile.@version}",
+            'org.eclipse.jdt.ui.ignorelowercasenames': 'true',
+            'org.eclipse.jdt.ui.importorder': 'java;javax;org;com;',
+            'org.eclipse.jdt.ui.ondemandthreshold': '99',
+            'org.eclipse.jdt.ui.staticondemandthreshold': '99',
+        ])
+    }
+
+    tasks.cleanEclipse.doLast {
+        project.delete '.settings', '.classpath', '.project'
     }
 }
 
@@ -152,62 +146,89 @@ configure(mainProjects) {
     group = 'com.github.sahara3'
     version = '1.0.0-SNAPSHOT'
 
-    apply plugin: 'java'
-    apply plugin: 'eclipse'
+    ext {
+        mavenPrivateUrl = properties.get('maven.private.url', null)
+        mavenPrivateUsername = properties.get('maven.private.username', null)
+        mavenPrivatePassword = properties.get('maven.private.password', null)
+    }
+
+    apply plugin: 'java-library'
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 
     dependencies {
         compileOnly 'javax.servlet:javax.servlet-api'
-        compile 'org.springframework:spring-web'
-        compile 'org.springframework.security:spring-security-web'
-        compile 'org.springframework.security:spring-security-config'
-        compile 'org.springframework.boot:spring-boot'
-        compile 'org.springframework.boot:spring-boot-autoconfigure'
-        compile 'org.slf4j:slf4j-api'
+        compileOnly 'com.google.code.findbugs:jsr305'
+
+        api 'org.springframework.security:spring-security-web'
+        api 'org.springframework.security:spring-security-config'
+        implementation 'org.springframework:spring-web'
+        implementation 'org.springframework.boot:spring-boot'
+        implementation 'org.springframework.boot:spring-boot-autoconfigure'
+        implementation 'org.slf4j:slf4j-api'
     }
 
     jar {
         manifest {
             attributes('Implementation-Title': name,
-                       'Implementation-Version': version)
+                       'Implementation-Version': archiveVersion)
         }
     }
 
     // ---------------------------------------------------------------
     // Maven Publising
     // ---------------------------------------------------------------
-    apply plugin: 'maven'
+    apply plugin: 'maven-publish'
 
-    configurations {
-        deployerJars
-    }
-
-    dependencies {
-        deployerJars 'org.apache.maven.wagon:wagon-ssh:2.2'
-    }
-
-    uploadArchives {
-        repositories.mavenDeployer {
-            configuration = configurations.deployerJars
-            repository(url: privateRepositoryUrl) {
-                authentication(userName: privateRepositoryUsername,
-                               password: privateRepositoryPassword)
+    publishing {
+        publications {
+            ssolite(MavenPublication) {
+                from components.java
+                versionMapping {
+                    usage('java-api') {
+                        fromResolutionOf('runtimeClasspath')
+                    }
+                    usage('java-runtime') {
+                        fromResolutionResult()
+                    }
+                }
+                pom {
+                    name = 'SSOLite'
+                    description = 'A lightweight single sign on library'
+                    url = 'https://github.com/sahara3/ssolite'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'sahara3'
+                            name = 'Soichiro SAHARA'
+                            email = 'soichiro.sahara@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:git://github.com/sahara3/ssolite.git'
+                        developerConnection = 'scm:git:git://github.com/sahara3/ssolite.git'
+                        url = 'https://github.com/sahara3/ssolite'
+                    }
+                }
             }
         }
-    }
-
-    task sourceJar(type: Jar, dependsOn:classes) {
-        classifier = 'sources'
-        from sourceSets.main.allSource
-    }
-
-    task javadocJar(type: Jar, dependsOn:javadoc) {
-        classifier = 'javadoc'
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives sourceJar
-        archives javadocJar
+        repositories {
+            maven {
+                url mavenPrivateUrl
+                credentials {
+                    username mavenPrivateUsername
+                    password mavenPrivatePassword
+                }
+            }
+        }
     }
 }
 
@@ -217,15 +238,14 @@ configure(mainProjects) {
 def sampleProjects = subprojects.findAll { it.path.startsWith(':sample') }
 
 configure(sampleProjects) {
-    apply plugin: 'java'
-    apply plugin: 'eclipse'
-
     dependencies {
         compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
         testCompileOnly 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
 
-        compile 'javax.validation:validation-api'
-        compile project(':ssolite')
+        implementation 'javax.validation:validation-api'
+        implementation project(':ssolite')
     }
 
     task delombok(type: JavaExec, dependsOn: compileJava) {
@@ -251,12 +271,13 @@ project(':sample-server') {
     apply plugin: 'org.springframework.boot'
 
     dependencies {
-        compile 'org.springframework.boot:spring-boot-starter-web'
-        compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
-        compile 'org.springframework.boot:spring-boot-starter-security'
-        compile 'org.springframework.session:spring-session-core'
-        compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
-        compile 'org.slf4j:slf4j-api'
+        implementation 'javax.servlet:javax.servlet-api'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.session:spring-session-core'
+        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
+        implementation 'org.slf4j:slf4j-api'
     }
 }
 
@@ -264,37 +285,38 @@ project(':sample-client-spring') {
     apply plugin: 'org.springframework.boot'
 
     dependencies {
-        compile 'org.springframework.boot:spring-boot-starter-web'
-        compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
-        compile 'org.springframework.boot:spring-boot-starter-security'
-        compile 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
-        compile 'org.slf4j:slf4j-api'
+        implementation 'javax.servlet:javax.servlet-api'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
+        implementation 'org.slf4j:slf4j-api'
     }
 }
 
 project(':sample-client-struts2') {
     apply plugin: 'war'
-    apply plugin: 'org.akhikhl.gretty'
+    apply plugin: 'org.gretty'
 
     dependencies {
         compileOnly 'javax.servlet:javax.servlet-api'
 
-        compile 'org.apache.struts:struts2-core'
-        compile 'com.squareup.okhttp3:okhttp'
-        compile 'com.fasterxml.jackson.core:jackson-databind'
-        compile 'org.slf4j:slf4j-api'
-        runtime 'ch.qos.logback:logback-classic'
-        runtime 'org.apache.logging.log4j:log4j-to-slf4j'
+        implementation 'org.apache.struts:struts2-core'
+        implementation 'com.squareup.okhttp3:okhttp'
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation 'org.slf4j:slf4j-api'
+        runtimeOnly 'ch.qos.logback:logback-classic'
+        runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j'
     }
 
     gretty {
         httpPort = 8081
-        servletContainer = 'tomcat8'
+        servletContainer = 'tomcat9'
         contextPath = '/'
     }
 
     afterEvaluate {
-        configurations.runtime.resolvedConfiguration.resolvedArtifacts.each {
+        configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.each {
             gretty.classPath it.file
         }
     }
