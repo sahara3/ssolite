@@ -1,7 +1,6 @@
 package com.github.sahara3.ssolite.server.service;
 
 import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 import org.springframework.lang.Nullable;
@@ -25,15 +24,14 @@ public class SsoLiteAccessTokenServiceImpl implements SsoLiteAccessTokenService 
     }
 
     @Override
-    @Nullable
-    public SsoLiteAccessToken findValidAccessToken(String tokenId) {
+    public @Nullable SsoLiteAccessToken findValidAccessToken(String tokenId) {
         Assert.notNull(tokenId, "tokenId cannot be null");
 
         SsoLiteAccessToken token = this.accessTokenRepository.findById(tokenId);
         if (token != null) {
-            Date now = new Date();
             this.accessTokenRepository.delete(token.getId());
-            if (token.getExpired().after(now)) {
+            if (token.getExpired().isAfter(OffsetDateTime.now())) {
+                token.setExpired(null); // hide expired.
                 return token;
             }
             // fall through.
@@ -46,7 +44,7 @@ public class SsoLiteAccessTokenServiceImpl implements SsoLiteAccessTokenService 
         Assert.notNull(username, "username cannot be null");
 
         String id = UUID.randomUUID().toString();
-        Date expired = Date.from(OffsetDateTime.now().plusSeconds(30).toInstant());
+        OffsetDateTime expired = OffsetDateTime.now().plusSeconds(30);
         SsoLiteAccessToken token = new SsoLiteAccessToken(id, username, expired);
         this.accessTokenRepository.save(token);
         return token;

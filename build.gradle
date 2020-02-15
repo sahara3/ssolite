@@ -8,6 +8,7 @@ buildscript {
 
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.RELEASE'
+        classpath 'com.github.spotbugs:spotbugs-gradle-plugin:3.0.0'
         classpath 'gradle.plugin.org.gretty:gretty:3.0.1'
     }
 }
@@ -44,6 +45,7 @@ configure(allprojects) {
 configure(subprojects) {
     apply plugin: 'java'
     apply plugin: 'eclipse'
+    apply plugin: 'com.github.spotbugs'
 
     ext {
         javaEncoding = 'UTF-8'
@@ -135,6 +137,31 @@ configure(subprojects) {
     tasks.cleanEclipse.doLast {
         project.delete '.settings', '.classpath', '.project'
     }
+
+    spotbugs {
+        sourceSets = [sourceSets.main]
+        ignoreFailures = false
+        effort = 'max'
+        reportLevel = 'low'
+    }
+
+    configurations {
+        spotbugsLogging
+    }
+
+    dependencies {
+        spotbugsLogging 'org.slf4j:slf4j-nop'
+    }
+
+    afterEvaluate {
+        tasks.withType(com.github.spotbugs.SpotBugsTask) {
+            reports.xml.enabled = false
+            reports.html.enabled = true
+
+            classpath += files(configurations.compileOnly.resolvedConfiguration.files)
+            spotbugsClasspath += files(configurations.spotbugsLogging.resolvedConfiguration.files)
+        }
+    }
 }
 
 // ===================================================================
@@ -169,6 +196,12 @@ configure(mainProjects) {
         implementation 'org.springframework.boot:spring-boot'
         implementation 'org.springframework.boot:spring-boot-autoconfigure'
         implementation 'org.slf4j:slf4j-api'
+
+        testImplementation('org.springframework.boot:spring-boot-starter-test') {
+            exclude group: 'junit', module: 'junit'
+        }
+        testImplementation 'org.junit.jupiter:junit-jupiter-api'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }
 
     jar {
@@ -176,6 +209,10 @@ configure(mainProjects) {
             attributes('Implementation-Title': name,
                        'Implementation-Version': archiveVersion)
         }
+    }
+
+    test {
+        useJUnitPlatform()
     }
 
     // ---------------------------------------------------------------
@@ -307,6 +344,10 @@ project(':sample-client-struts2') {
         implementation 'org.slf4j:slf4j-api'
         runtimeOnly 'ch.qos.logback:logback-classic'
         runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j'
+    }
+
+    spotbugs {
+        excludeFilter = file('spotbugs-exclude.xml')
     }
 
     gretty {

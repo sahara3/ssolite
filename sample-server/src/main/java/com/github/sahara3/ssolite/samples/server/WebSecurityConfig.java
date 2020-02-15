@@ -69,9 +69,8 @@ public class WebSecurityConfig {
         protected void configure(HttpSecurity http) throws Exception {
             // success handler.
             SsoLiteServerAuthenticationSuccessHandler successHandler;
-            successHandler = new SsoLiteServerAuthenticationSuccessHandler(this.redirectResolver);
-            successHandler.setDefaultTopPageUrl(this.ssoServerProperties.getDefaultTopPageUrl());
-            successHandler.setPermittedDomainMap(this.ssoServerProperties.getPermittedDomainMap());
+            successHandler = new SsoLiteServerAuthenticationSuccessHandler(this.redirectResolver,
+                    this.ssoServerProperties.getDefaultTopPageUrl());
 
             // failure handler.
             SsoLiteServerAuthenticationFailureHandler failureHandler;

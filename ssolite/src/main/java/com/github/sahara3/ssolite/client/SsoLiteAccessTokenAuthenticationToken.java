@@ -2,6 +2,7 @@ package com.github.sahara3.ssolite.client;
 
 import java.util.Collection;
 
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -14,6 +15,7 @@ public class SsoLiteAccessTokenAuthenticationToken extends AbstractAuthenticatio
 
     private static final long serialVersionUID = 1L;
 
+    @Nullable
     private final Object principal;
 
     @Override

@@ -1,9 +1,6 @@
 package com.github.sahara3.ssolite.server;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,8 +23,12 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
 
     protected final SsoLiteServerRedirectResolver redirectResolver;
 
-    public SsoLiteServerAuthenticationSuccessHandler(SsoLiteServerRedirectResolver redirectResolver) {
+    public SsoLiteServerAuthenticationSuccessHandler(SsoLiteServerRedirectResolver redirectResolver,
+            String defaultTopPageUrl) {
+        Assert.notNull(redirectResolver, "redirectResolver cannot be null");
+        Assert.notNull(defaultTopPageUrl, "defaultTopPageUrl cannot be null");
         this.redirectResolver = redirectResolver;
+        this.defaultTopPageUrl = defaultTopPageUrl;
     }
 
     protected String defaultTopPageUrl;
@@ -45,16 +46,6 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
     public void setDefaultTopPageUrl(String defaultTopPageUrl) {
         Assert.notNull(defaultTopPageUrl, "defaultTopPageUrl cannot be null");
         this.defaultTopPageUrl = defaultTopPageUrl;
-    }
-
-    protected Map<URI, URI> permittedDomainMap = new HashMap<>();
-
-    /**
-     * @param permittedDomainMap the permitted domain map to set
-     */
-    public void setPermittedDomainMap(Map<URI, URI> permittedDomainMap) {
-        Assert.notNull(permittedDomainMap, "permittedDomainMap cannot be null");
-        this.permittedDomainMap = permittedDomainMap;
     }
 
     @Override

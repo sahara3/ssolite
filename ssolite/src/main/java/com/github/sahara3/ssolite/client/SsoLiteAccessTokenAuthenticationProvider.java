@@ -145,12 +145,14 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
             throw new BadCredentialsException("Bad credentials.");
         }
 
-        String username = response.getBody().getUsername();
+        SsoLiteAccessToken token = response.getBody();
 
         // retrieve the local user details object via UserDetailsService.
-        UserDetails loadedUser;
+        UserDetails loadedUser = null;
         try {
-            loadedUser = this.getUserDetailsService().loadUserByUsername(username);
+            if (token != null) {
+                loadedUser = this.getUserDetailsService().loadUserByUsername(token.getUsername());
+            }
         }
         catch (UsernameNotFoundException e) {
             throw e;

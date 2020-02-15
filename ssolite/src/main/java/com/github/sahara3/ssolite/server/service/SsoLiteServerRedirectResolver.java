@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -97,7 +98,7 @@ public class SsoLiteServerRedirectResolver {
         return builder.toString();
     }
 
-    protected URI getSsoRedirectDestinationUri(String from) {
+    protected @Nullable URI getSsoRedirectDestinationUri(String from) {
         Assert.notNull(from, "from cannot be null");
 
         // TODO: support a domain that have multiple applications (sso-login).

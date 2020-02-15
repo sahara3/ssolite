@@ -14,7 +14,7 @@ public interface SsoLiteAccessTokenService {
     /**
      * Retrieves an access token by its ID.
      *
-     * If there is no valid token, this returns null.
+     * The expired property of the token is hidden (filled in null). If there is no valid token, this returns null.
      *
      * @param tokenId the access token ID.
      * @return the access token, or null if there is no valid token.

@@ -77,10 +77,8 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
         String redirectUrl = this.urlBuilder.buildRedirectUrl(request, url);
 
         // append "from".
-        if (from != null) {
-            String encoded = UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8.name());
-            redirectUrl += "?from=" + encoded;
-        }
+        String encoded = UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8.name());
+        redirectUrl += "?from=" + encoded;
 
         LOG.debug("Redirect URL: {}", redirectUrl);
         return redirectUrl;

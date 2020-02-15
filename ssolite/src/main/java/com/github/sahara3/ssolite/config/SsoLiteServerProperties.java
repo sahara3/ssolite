@@ -69,7 +69,7 @@ public class SsoLiteServerProperties {
         this.updatePermittedDomainMap();
     }
 
-    private Map<URI, URI> permittedDomainMap;
+    private Map<URI, URI> permittedDomainMap = new HashMap<>();
 
     /**
      * Map of SSO permitted domains.

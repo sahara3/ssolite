@@ -1,6 +1,6 @@
 package com.github.sahara3.ssolite.model;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 /**
@@ -14,7 +14,7 @@ public class SsoLiteAccessToken {
         // do nothing.
     }
 
-    public SsoLiteAccessToken(String id, String username, Date expired) {
+    public SsoLiteAccessToken(String id, String username, OffsetDateTime expired) {
         this.id = id;
         this.username = username;
         this.expired = expired;
@@ -40,13 +40,13 @@ public class SsoLiteAccessToken {
         this.username = username;
     }
 
-    private Date expired;
+    private OffsetDateTime expired;
 
-    public Date getExpired() {
+    public OffsetDateTime getExpired() {
         return this.expired;
     }
 
-    public void setExpired(Date expired) {
+    public void setExpired(OffsetDateTime expired) {
         this.expired = expired;
     }
 
