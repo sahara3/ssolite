@@ -1,11 +1,13 @@
 package com.github.sahara3.ssolite.samples.client.struts2.action;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts2.interceptor.ServletRequestAware;
-import org.springframework.web.util.UriUtils;
 
-import com.github.sahara3.ssolite.util.SsoLiteRedirectUrlBuilder;
+import com.github.sahara3.ssolite.core.util.SsoLiteRedirectUrlBuilder;
+import com.github.sahara3.ssolite.core.util.SsoLiteUriUtils;
 import com.opensymphony.xwork2.ActionSupport;
 
 import lombok.Getter;
@@ -42,7 +44,7 @@ public class SsoLiteEntryPointAction extends ActionSupport implements ServletReq
 
         // append "from".
         if (from != null) {
-            String encoded = UriUtils.encodeQueryParam(from, "utf-8");
+            String encoded = SsoLiteUriUtils.encodeQueryParam(from, StandardCharsets.UTF_8);
             this.redirectUrl += "?from=" + encoded;
         }
 

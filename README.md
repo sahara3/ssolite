@@ -10,9 +10,9 @@ a client's job.
 ## Samples
 
 ### Server sample using Spring
-'sample-server' is a server sample. To run it:
+'sample-server-spring' is a server sample using Spring. To run it:
 ```sh
-$ ./gradlew sample-server:bootRun
+$ ./gradlew sample-server-spring:bootRun
 ```
 You can access this server with http://localhost:8080/. In the login
 page, you enter the username and password to login.

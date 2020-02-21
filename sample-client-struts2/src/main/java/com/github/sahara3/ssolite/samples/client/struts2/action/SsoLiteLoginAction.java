@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.sahara3.ssolite.model.SsoLiteAccessToken;
+import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
 import com.github.sahara3.ssolite.samples.client.struts2.interceptor.AuthInterceptor;
 import com.github.sahara3.ssolite.samples.client.struts2.model.AuthToken;
 import com.github.sahara3.ssolite.samples.client.struts2.model.LocalUser;
