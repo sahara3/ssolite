@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.RELEASE'
         classpath 'com.github.spotbugs:spotbugs-gradle-plugin:3.0.0'
-        classpath 'gradle.plugin.org.gretty:gretty:3.0.1'
+        classpath 'com.github.sahara3:gradle-tomcat-runner-plugin:0.2.1'
     }
 }
 
@@ -333,7 +333,7 @@ project(':sample-client-spring') {
 
 project(':sample-client-struts2') {
     apply plugin: 'war'
-    apply plugin: 'org.gretty'
+    apply plugin: 'com.github.sahara3.tomcat-runner'
 
     dependencies {
         compileOnly 'javax.servlet:javax.servlet-api'
@@ -350,15 +350,12 @@ project(':sample-client-struts2') {
         excludeFilter = file('spotbugs-exclude.xml')
     }
 
-    gretty {
-        httpPort = 8081
-        servletContainer = 'tomcat9'
-        contextPath = '/'
-    }
-
-    afterEvaluate {
-        configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.each {
-            gretty.classPath it.file
+    // run this on tomcat.
+    tomcat {
+        version = 9.0
+        port = 8081
+        webapp(project) {
+            contextPath = ''
         }
     }
 }
