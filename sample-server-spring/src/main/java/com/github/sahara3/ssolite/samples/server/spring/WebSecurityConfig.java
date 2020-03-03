@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.github.sahara3.ssolite.spring.boot.autoconfigure.SsoLiteServerProperties;
 import com.github.sahara3.ssolite.spring.server.SsoLiteServerAuthenticationFailureHandler;
 import com.github.sahara3.ssolite.spring.server.SsoLiteServerAuthenticationSuccessHandler;
-import com.github.sahara3.ssolite.spring.server.service.SsoLiteServerRedirectResolver;
+import com.github.sahara3.ssolite.spring.server.SsoLiteServerRedirectResolver;
 
 /**
  * Web security configuration for SSOLite server.
@@ -74,7 +74,7 @@ public class WebSecurityConfig {
 
             // failure handler.
             SsoLiteServerAuthenticationFailureHandler failureHandler;
-            failureHandler = new SsoLiteServerAuthenticationFailureHandler("/login?error");
+            failureHandler = new SsoLiteServerAuthenticationFailureHandler(this.redirectResolver, "/login?error");
 
             // @formatter:off
             http.authorizeRequests()

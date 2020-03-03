@@ -1,7 +1,6 @@
 package com.github.sahara3.ssolite.spring.server;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +15,6 @@ import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.UrlUtils;
 import org.springframework.util.Assert;
-import org.springframework.web.util.UriUtils;
 
 /**
  * Authentication failure handler for SSOLite server.
@@ -27,44 +25,35 @@ public class SsoLiteServerAuthenticationFailureHandler implements Authentication
 
     private static final Logger LOG = LoggerFactory.getLogger(SsoLiteServerAuthenticationFailureHandler.class);
 
+    private final SsoLiteServerRedirectResolver redirectResolver;
+
     private final String forwardUrl;
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     /**
-     * @param forwardUrl URL to forward when login failure.
+     * @param redirectResolver Redirect resolver of SSOLite.
+     * @param forwardUrl       URL to forward when login failure.
      */
-    public SsoLiteServerAuthenticationFailureHandler(String forwardUrl) {
+    public SsoLiteServerAuthenticationFailureHandler(SsoLiteServerRedirectResolver redirectResolver,
+            String forwardUrl) {
+        Assert.notNull(redirectResolver, "redirectResolver cannot be null");
         Assert.isTrue(UrlUtils.isValidRedirectUrl(forwardUrl), "'" + forwardUrl + "' is not a valid forward URL");
+        this.redirectResolver = redirectResolver;
         this.forwardUrl = forwardUrl;
     }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException exception) throws IOException, ServletException {
-        String url = this.forwardUrl;
+        Assert.notNull(request, "request cannot be null");
+        Assert.notNull(response, "response cannot be null");
 
-        String from = request.getParameter("from"); // can be null.
-        LOG.debug("onAuthenticationSuccess: from={}", from);
-
-        if (from != null) {
-            String query = "from=" + UriUtils.encodeQueryParam(from, StandardCharsets.UTF_8);
-            if (this.forwardUrl.contains("?")) {
-                if (this.forwardUrl.endsWith("?")) {
-                    url += query;
-                }
-                else {
-                    url += "&" + query;
-                }
-            }
-            else {
-                url += "?" + query;
-            }
-        }
+        String url = this.redirectResolver.resolveRedirectUrlOnFailure(request, this.forwardUrl);
+        LOG.debug("Redirect URL: {}", url);
 
         request.setAttribute(WebAttributes.AUTHENTICATION_EXCEPTION, exception);
 
-        LOG.debug("Redirect URL: {}", url);
         Assert.notNull(url, "Redirect URL cannot be null");
         this.redirectStrategy.sendRedirect(request, response, url);
     }

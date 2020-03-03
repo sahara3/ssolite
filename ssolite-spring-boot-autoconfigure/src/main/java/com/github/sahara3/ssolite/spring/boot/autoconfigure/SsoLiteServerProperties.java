@@ -1,18 +1,10 @@
 package com.github.sahara3.ssolite.spring.boot.autoconfigure;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import com.github.sahara3.ssolite.core.util.SsoLiteUriUtils;
 
 /**
  * Server properties of SSOLite.
@@ -21,8 +13,6 @@ import com.github.sahara3.ssolite.core.util.SsoLiteUriUtils;
  */
 @ConfigurationProperties(prefix = "ssolite.server")
 public class SsoLiteServerProperties {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SsoLiteServerProperties.class);
 
     private String defaultTopPageUrl = "internal:/";
 
@@ -59,45 +49,6 @@ public class SsoLiteServerProperties {
      */
     public List<String> getPermittedDomains() {
         return this.permittedDomains;
-    }
-
-    /**
-     * @param permittedDomains the permitted domain URLs to set.
-     */
-    public void setPermittedDomains(List<String> permittedDomains) {
-        this.permittedDomains = permittedDomains;
-        this.updatePermittedDomainMap();
-    }
-
-    private Map<URI, URI> permittedDomainMap = new HashMap<>();
-
-    /**
-     * Map of SSO permitted domains.
-     *
-     * <p>
-     * Key is a domain only URL, and value is a URL pointed at the SSO login processing path in a client.
-     * </p>
-     *
-     * @return the permitted domain map.
-     */
-    public Map<URI, URI> getPermittedDomainMap() {
-        return this.permittedDomainMap;
-    }
-
-    private void updatePermittedDomainMap() {
-        this.permittedDomainMap = new HashMap<>();
-
-        this.permittedDomains.forEach(s -> {
-            try {
-                URI ssoLoginUri = new URI(s);
-                URI domainUri = SsoLiteUriUtils.getDomainUri(ssoLoginUri);
-                this.permittedDomainMap.put(domainUri, ssoLoginUri);
-                LOG.debug("Permitted domain: {}", s);
-            }
-            catch (URISyntaxException e) {
-                LOG.warn("Invalid URI: " + s, e);
-            }
-        });
     }
 
     @Override

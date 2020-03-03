@@ -12,7 +12,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.github.sahara3.ssolite.core.util.SsoLiteRedirectUrlBuilder;
-import com.github.sahara3.ssolite.spring.server.service.SsoLiteServerRedirectResolver;
 
 /**
  * Authentication success handler for SSOLite server.
@@ -56,12 +55,8 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
             return;
         }
 
-        String from = request.getParameter("from"); // can be null.
-        this.logger.debug("onAuthenticationSuccess: from=" + from);
-
-        if (from != null) {
-            String target = this.redirectResolver.getRedirectDestination(from, authentication);
-
+        String target = this.redirectResolver.resolveRedirectUrlOnSuccess(request, authentication);
+        if (target != null) {
             this.clearAuthenticationAttributes(request);
 
             this.logger.debug("Redirect URL: " + target);

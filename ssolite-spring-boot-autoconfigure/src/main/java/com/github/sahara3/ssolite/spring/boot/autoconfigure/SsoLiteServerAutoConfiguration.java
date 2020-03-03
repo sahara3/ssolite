@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.util.Assert;
 
+import com.github.sahara3.ssolite.spring.server.SsoLiteServerRedirectResolver;
 import com.github.sahara3.ssolite.spring.server.repository.SsoLiteAccessTokenRepository;
 import com.github.sahara3.ssolite.spring.server.repository.SsoLiteAccessTokenRepositoryImpl;
 import com.github.sahara3.ssolite.spring.server.service.SsoLiteAccessTokenService;
 import com.github.sahara3.ssolite.spring.server.service.SsoLiteAccessTokenServiceImpl;
-import com.github.sahara3.ssolite.spring.server.service.SsoLiteServerRedirectResolver;
 
 /**
  * Server auto configuration for SSOLite.
@@ -66,7 +66,7 @@ public class SsoLiteServerAutoConfiguration {
         Assert.notNull(ssoLiteAccessTokenService, "ssoLiteAccessTokenService cannot be null");
         Assert.notNull(ssoLiteServerProperties, "ssoLiteServerProperties cannot be null");
         SsoLiteServerRedirectResolver resolver = new SsoLiteServerRedirectResolver(ssoLiteAccessTokenService);
-        resolver.setPermittedDomainMap(ssoLiteServerProperties.getPermittedDomainMap());
+        resolver.setPermittedDomains(ssoLiteServerProperties.getPermittedDomains());
         return resolver;
     }
 }
