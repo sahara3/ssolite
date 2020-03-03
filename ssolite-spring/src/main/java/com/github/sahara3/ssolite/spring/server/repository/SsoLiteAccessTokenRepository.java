@@ -15,7 +15,7 @@ public interface SsoLiteAccessTokenRepository {
      * Retrieves an access token by its ID.
      *
      * @param id must not be null.
-     * @return the access token with the given ID, or null if not found.
+     * @return the access token with the given ID, or {@code null} if not found.
      */
     @Nullable
     SsoLiteAccessToken findById(String id);

@@ -32,7 +32,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     /**
-     * {@code CookieSerializer} bean.
+     * {@link CookieSerializer} bean.
      *
      * @return the {@code CookieSerializer} bean.
      */

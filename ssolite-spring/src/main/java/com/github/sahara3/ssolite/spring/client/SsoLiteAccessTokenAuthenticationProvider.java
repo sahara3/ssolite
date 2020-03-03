@@ -25,7 +25,6 @@ import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
  * Authentication provider for SSOLite client.
  *
  * @author sahara3
- *
  */
 public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationProvider {
 

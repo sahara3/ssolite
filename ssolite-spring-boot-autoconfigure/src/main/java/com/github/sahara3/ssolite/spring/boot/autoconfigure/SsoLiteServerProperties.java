@@ -33,14 +33,14 @@ public class SsoLiteServerProperties {
      * If a URL starts with &quot;internal:&quot;, a path is relative from the context root.
      * </p>
      *
-     * @return the default top page URL
+     * @return the default top page URL.
      */
     public String getDefaultTopPageUrl() {
         return this.defaultTopPageUrl;
     }
 
     /**
-     * @param defaultTopPageUrl the default top page URL to set
+     * @param defaultTopPageUrl the default top page URL to set.
      */
     public void setDefaultTopPageUrl(String defaultTopPageUrl) {
         this.defaultTopPageUrl = defaultTopPageUrl;
@@ -55,14 +55,14 @@ public class SsoLiteServerProperties {
      * Each URL points the SSO login processing path in the client.
      * </p>
      *
-     * @return the list of the permitted domain URLs
+     * @return the list of the permitted domain URLs.
      */
     public List<String> getPermittedDomains() {
         return this.permittedDomains;
     }
 
     /**
-     * @param permittedDomains the permitted domain URLs to set
+     * @param permittedDomains the permitted domain URLs to set.
      */
     public void setPermittedDomains(List<String> permittedDomains) {
         this.permittedDomains = permittedDomains;
@@ -78,7 +78,7 @@ public class SsoLiteServerProperties {
      * Key is a domain only URL, and value is a URL pointed at the SSO login processing path in a client.
      * </p>
      *
-     * @return the permitted domain map
+     * @return the permitted domain map.
      */
     public Map<URI, URI> getPermittedDomainMap() {
         return this.permittedDomainMap;

@@ -81,10 +81,40 @@ configure(subprojects) {
         ]
     }
 
+    configurations {
+        javadocLink {
+            extendsFrom apiElements
+        }
+    }
+
     tasks.withType(Javadoc) {
-        options.encoding = javaEncoding
         options.charSet = javaEncoding
-        options.links 'http://docs.oracle.com/javase/8/docs/api/'
+        options.encoding = javaEncoding
+        options.docEncoding = javaEncoding
+        options.links 'https://docs.oracle.com/javase/8/docs/api/'
+    }
+
+    tasks.withType(Javadoc) { task ->
+        task.doFirst {
+            def urlPrefix = 'https://javadoc.io/doc'
+
+            configurations.javadocLink.resolvedConfiguration.resolvedArtifacts.findAll {
+                !(it.id.componentIdentifier instanceof ProjectComponentIdentifier)
+            }.collect {
+                it.moduleVersion.id
+            }.each {
+                task.options.links "${urlPrefix}/${it.group}/${it.name}/${it.version}/"
+            }
+
+            configurations.javadocLink.resolvedConfiguration.resolvedArtifacts.findAll {
+                it.id.componentIdentifier instanceof ProjectComponentIdentifier
+            }.each {
+                def m = it.moduleVersion.id
+                def url = "${urlPrefix}/${m.group}/${m.name}/${m.version}/"
+                def dir = project(it.id.componentIdentifier.projectPath).tasks.javadoc.destinationDir
+                task.options.linksOffline url, dir.path
+            }
+        }
     }
 
     tasks.clean.doLast {

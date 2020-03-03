@@ -49,7 +49,7 @@ public class ExternalAuthenticationEntryPoint implements AuthenticationEntryPoin
      * Constructs the external entry point.
      *
      * <p>
-     * This is same as {@code #ExternalAuthenticationEntryPoint(loginFormUrl, false)}.
+     * This is same as {@code new ExternalAuthenticationEntryPoint(loginFormUrl, false)}.
      * </p>
      *
      * @param loginFormUrl the URL of login form.

@@ -17,14 +17,14 @@ public class SsoLiteClientProperties {
     /**
      * Server URL of SSO login page.
      *
-     * @return the login page URL
+     * @return the login page URL.
      */
     public String getLoginUrl() {
         return this.loginUrl;
     }
 
     /**
-     * @param loginUrl the login page URL to set
+     * @param loginUrl the login page URL to set.
      */
     public void setLoginUrl(String loginUrl) {
         this.loginUrl = loginUrl;
@@ -35,34 +35,32 @@ public class SsoLiteClientProperties {
     /**
      * Server URL of SSO token RESTful API.
      *
-     * @return the token API URL
+     * @return the token API URL.
      */
     public String getTokenApiUrl() {
         return this.tokenApiUrl;
     }
 
     /**
-     * @param tokenApiUrl the token API URL to set
+     * @param tokenApiUrl the token API URL to set.
      */
     public void setTokenApiUrl(String tokenApiUrl) {
         this.tokenApiUrl = tokenApiUrl;
     }
 
-    /**
-     */
     private boolean sameDomain = false;
 
     /**
      * True if the server and client are at the same domain.
      *
-     * @return the same domain flag
+     * @return the same domain flag.
      */
     public boolean isSameDomain() {
         return this.sameDomain;
     }
 
     /**
-     * @param sameDomain the same domain flag to set
+     * @param sameDomain the same domain flag to set.
      */
     public void setSameDomain(boolean sameDomain) {
         this.sameDomain = sameDomain;

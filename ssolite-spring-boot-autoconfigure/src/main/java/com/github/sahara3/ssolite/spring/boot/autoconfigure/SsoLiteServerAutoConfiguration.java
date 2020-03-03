@@ -29,9 +29,9 @@ import com.github.sahara3.ssolite.spring.server.service.SsoLiteServerRedirectRes
 public class SsoLiteServerAutoConfiguration {
 
     /**
-     * {@code SsoAccessTokenRepository} bean.
+     * {@link SsoLiteAccessTokenRepository} bean.
      *
-     * @return the {@code SsoAccessTokenRepository} bean.
+     * @return the {@code SsoLiteAccessTokenRepository} bean.
      */
     @Bean
     @ConditionalOnMissingBean(SsoLiteAccessTokenRepository.class)
@@ -40,10 +40,10 @@ public class SsoLiteServerAutoConfiguration {
     }
 
     /**
-     * {@code SsoAccessTokenService} bean.
+     * {@link SsoLiteAccessTokenService} bean.
      *
      * @param ssoLiteAccessTokenRepository must not be null.
-     * @return the {@code SsoAccessTokenService} bean.
+     * @return the {@code SsoLiteAccessTokenService} bean.
      */
     @Bean
     @ConditionalOnMissingBean(SsoLiteAccessTokenService.class)
@@ -53,7 +53,7 @@ public class SsoLiteServerAutoConfiguration {
     }
 
     /**
-     * {@code SsoLiteServerRedirectResolver} bean.
+     * {@link SsoLiteServerRedirectResolver} bean.
      *
      * @param ssoLiteAccessTokenService must not be null.
      * @param ssoLiteServerProperties   must not be null.

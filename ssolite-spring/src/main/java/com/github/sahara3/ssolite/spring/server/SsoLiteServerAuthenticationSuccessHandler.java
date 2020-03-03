@@ -11,8 +11,8 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import com.github.sahara3.ssolite.spring.server.service.SsoLiteServerRedirectResolver;
 import com.github.sahara3.ssolite.core.util.SsoLiteRedirectUrlBuilder;
+import com.github.sahara3.ssolite.spring.server.service.SsoLiteServerRedirectResolver;
 
 /**
  * Authentication success handler for SSOLite server.
@@ -34,14 +34,14 @@ public class SsoLiteServerAuthenticationSuccessHandler extends SavedRequestAware
     protected String defaultTopPageUrl;
 
     /**
-     * @return the default top page URL
+     * @return the default top page URL.
      */
     public String getDefaultTopPageUrl() {
         return this.defaultTopPageUrl;
     }
 
     /**
-     * @param defaultTopPageUrl the default top page URL to set
+     * @param defaultTopPageUrl the default top page URL to set.
      */
     public void setDefaultTopPageUrl(String defaultTopPageUrl) {
         Assert.notNull(defaultTopPageUrl, "defaultTopPageUrl cannot be null");

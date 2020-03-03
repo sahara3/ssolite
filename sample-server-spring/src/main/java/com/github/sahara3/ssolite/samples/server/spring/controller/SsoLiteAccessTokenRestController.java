@@ -30,7 +30,7 @@ public class SsoLiteAccessTokenRestController {
      * Retrieves an access token by its ID.
      *
      * @param tokenId must not be null.
-     * @return the access token
+     * @return the access token.
      * @throws SsoLiteAccessTokenNotFoundException thrown if the token ID is invalid.
      */
     @GetMapping(path = "tokens/{tokenId}")

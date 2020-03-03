@@ -20,7 +20,7 @@ public class SsoLiteRedirectUrlBuilder {
      * @param request the request object.
      * @param url     the URL to redirect.
      * @return the redirect URL.
-     * @throws IllegalArgumentException thrown if request or url is null.
+     * @throws IllegalArgumentException thrown if the {@code request} or {@code url} is {@code null}.
      */
     public String buildRedirectUrl(HttpServletRequest request, String url) throws IllegalArgumentException {
         Assert.notNull(request, "request cannot be null");

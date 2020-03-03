@@ -20,9 +20,7 @@ import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
 import com.github.sahara3.ssolite.core.util.SsoLiteUriUtils;
 
 /**
- * SSOLite redirect resolver.
- *
- * This resolves and returns the redirect URL after login.
+ * SSOLite redirect resolver. This resolves and returns the redirect URL after login.
  *
  * @author sahara3
  */

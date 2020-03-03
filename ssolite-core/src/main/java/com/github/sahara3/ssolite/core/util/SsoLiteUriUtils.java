@@ -54,7 +54,8 @@ public class SsoLiteUriUtils {
      * @param text    the text to be encoded.
      * @param charset the string encoding character set.
      * @return the encoded query parameter.
-     * @throws IllegalArgumentException thrown if text or charset is null, or charset is not supported.
+     * @throws IllegalArgumentException thrown if {@code text} or {@code charset} is {@code null}, or {@code charset} is
+     *                                  not supported.
      */
     public static String encodeQueryParam(String text, Charset charset) throws IllegalArgumentException {
         Assert.notNull(text, "text cannot be null");

@@ -12,7 +12,7 @@ public class Assert {
      *
      * @param object  the object to check.
      * @param message an exception message to use when the assertion fails.
-     * @throws IllegalArgumentException thrown if the object is null.
+     * @throws IllegalArgumentException thrown if the {@code object} is {@code null}.
      */
     public static void notNull(Object object, String message) throws IllegalArgumentException {
         if (object == null) {
