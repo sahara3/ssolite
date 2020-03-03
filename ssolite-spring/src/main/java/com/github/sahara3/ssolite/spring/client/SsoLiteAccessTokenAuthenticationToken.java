@@ -23,6 +23,7 @@ public class SsoLiteAccessTokenAuthenticationToken extends AbstractAuthenticatio
         return this.principal;
     }
 
+    @Nullable
     private Object credentials;
 
     @Override
@@ -49,8 +50,8 @@ public class SsoLiteAccessTokenAuthenticationToken extends AbstractAuthenticatio
      * @param credentials the user credentials.
      * @param authorities the user authorities.
      */
-    public SsoLiteAccessTokenAuthenticationToken(Object principal, Object credentials,
-            Collection<? extends GrantedAuthority> authorities) {
+    public SsoLiteAccessTokenAuthenticationToken(Object principal, @Nullable Object credentials,
+            @Nullable Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principal = principal;
         this.credentials = credentials;

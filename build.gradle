@@ -371,6 +371,9 @@ configure(project(':ssolite-spring')) {
         api 'org.springframework.security:spring-security-core'
         api 'org.springframework.security:spring-security-web'
         api 'org.springframework.security:spring-security-config'
+        api 'com.fasterxml.jackson.core:jackson-core'
+        api 'com.fasterxml.jackson.core:jackson-databind'
+        api 'com.fasterxml.jackson.core:jackson-annotations'
         implementation 'org.springframework:spring-core'
         implementation 'org.springframework:spring-web'
     }
