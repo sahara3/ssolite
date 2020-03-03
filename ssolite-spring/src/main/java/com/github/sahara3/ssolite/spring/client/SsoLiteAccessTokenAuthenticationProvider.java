@@ -2,7 +2,6 @@ package com.github.sahara3.ssolite.spring.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,8 +16,9 @@ import org.springframework.security.core.userdetails.UserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
-import org.springframework.web.client.RestTemplate;
 
+import com.github.sahara3.ssolite.core.client.SsoLiteAccessTokenApiClient;
+import com.github.sahara3.ssolite.core.client.SsoLiteAccessTokenApiException;
 import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
 
 /**
@@ -41,10 +41,10 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
         return this.accessTokenApiUrl;
     }
 
-    private final RestTemplate restTemplate;
+    private final SsoLiteAccessTokenApiClient accessTokenApiClient;
 
-    protected RestTemplate getRestTemplate() {
-        return this.restTemplate;
+    protected SsoLiteAccessTokenApiClient getAccessTokenApiClient() {
+        return this.accessTokenApiClient;
     }
 
     private final UserDetailsService userDetailsService;
@@ -54,18 +54,18 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
     }
 
     /**
-     * @param accessTokenApiUrl  the URL of the access token API.
-     * @param restTemplate       REST template object to request to the access token API.
-     * @param userDetailsService Your {@link UserDetailsService} implementation.
+     * @param accessTokenApiUrl    the URL of the access token API.
+     * @param accessTokenApiClient RESTful API client object to request to the access token API.
+     * @param userDetailsService   Your {@link UserDetailsService} implementation.
      */
-    public SsoLiteAccessTokenAuthenticationProvider(String accessTokenApiUrl, RestTemplate restTemplate,
-            UserDetailsService userDetailsService) {
+    public SsoLiteAccessTokenAuthenticationProvider(String accessTokenApiUrl,
+            SsoLiteAccessTokenApiClient accessTokenApiClient, UserDetailsService userDetailsService) {
         Assert.notNull(accessTokenApiUrl, "accessTokenApiUrl cannot be null");
-        Assert.notNull(restTemplate, "restTemplate cannot be null");
+        Assert.notNull(accessTokenApiClient, "accessTokenApiClient cannot be null");
         Assert.notNull(userDetailsService, "userDetailsService cannot be null");
 
         this.accessTokenApiUrl = accessTokenApiUrl;
-        this.restTemplate = restTemplate;
+        this.accessTokenApiClient = accessTokenApiClient;
         this.userDetailsService = userDetailsService;
     }
 
@@ -135,23 +135,22 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
 
         // call RESTful API to retrieve the username in the access token.
         String url = this.getAccessTokenApiUrl() + "/" + accessTokenId;
-        LOG.debug("GET {}", url);
-        ResponseEntity<SsoLiteAccessToken> response = this.restTemplate.getForEntity(url, SsoLiteAccessToken.class);
-        LOG.debug("Token API response: {}", response);
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            LOG.debug("Access token is not found, or HTTP error.");
+        SsoLiteAccessToken token = null;
+        try {
+            token = this.getAccessTokenApiClient().retriveAccessToken(url);
+        }
+        catch (SsoLiteAccessTokenApiException e) {
+            LOG.debug("Access token API error.", e);
+            // fall through.
+        }
+        if (token == null) {
             throw new BadCredentialsException("Bad credentials.");
         }
-
-        SsoLiteAccessToken token = response.getBody();
 
         // retrieve the local user details object via UserDetailsService.
         UserDetails loadedUser = null;
         try {
-            if (token != null) {
-                loadedUser = this.getUserDetailsService().loadUserByUsername(token.getUsername());
-            }
+            loadedUser = this.getUserDetailsService().loadUserByUsername(token.getUsername());
         }
         catch (UsernameNotFoundException e) {
             throw e;

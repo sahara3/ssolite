@@ -34,7 +34,7 @@ public class SsoLiteServerAutoConfiguration {
      * @return the {@code SsoLiteAccessTokenRepository} bean.
      */
     @Bean
-    @ConditionalOnMissingBean(SsoLiteAccessTokenRepository.class)
+    @ConditionalOnMissingBean
     public SsoLiteAccessTokenRepository ssoAccessTokenRepository() {
         return new SsoLiteAccessTokenRepositoryImpl();
     }
@@ -46,7 +46,7 @@ public class SsoLiteServerAutoConfiguration {
      * @return the {@code SsoLiteAccessTokenService} bean.
      */
     @Bean
-    @ConditionalOnMissingBean(SsoLiteAccessTokenService.class)
+    @ConditionalOnMissingBean
     public SsoLiteAccessTokenService ssoAccessTokenService(SsoLiteAccessTokenRepository ssoLiteAccessTokenRepository) {
         Assert.notNull(ssoLiteAccessTokenRepository, "ssoLiteAccessTokenRepository cannot be null");
         return new SsoLiteAccessTokenServiceImpl(ssoLiteAccessTokenRepository);
@@ -60,7 +60,7 @@ public class SsoLiteServerAutoConfiguration {
      * @return the {@code SsoLiteServerRedirectResolver} bean.
      */
     @Bean
-    @ConditionalOnMissingBean(SsoLiteServerRedirectResolver.class)
+    @ConditionalOnMissingBean
     public SsoLiteServerRedirectResolver ssoLiteServerRedirectResolver(
             SsoLiteAccessTokenService ssoLiteAccessTokenService, SsoLiteServerProperties ssoLiteServerProperties) {
         Assert.notNull(ssoLiteAccessTokenService, "ssoLiteAccessTokenService cannot be null");
