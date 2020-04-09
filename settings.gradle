@@ -1,6 +1,10 @@
-rootProject.name = 'root'
+rootProject.name = 'ssolite'
 
-include ':ssolite'
-include ':sample-server'
+include ':ssolite-core'
+include ':ssolite-spring'
+include ':ssolite-spring-boot-autoconfigure'
+include ':ssolite-spring-boot-starter'
+
+include ':sample-server-spring'
 include ':sample-client-spring'
 include ':sample-client-struts2'

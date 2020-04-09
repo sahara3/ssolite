@@ -10,10 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.github.sahara3.ssolite.client.ExternalAuthenticationEntryPoint;
-import com.github.sahara3.ssolite.client.SsoLiteAccessTokenAuthenticationProvider;
-import com.github.sahara3.ssolite.client.SsoLiteClientLoginConfigurer;
-import com.github.sahara3.ssolite.config.SsoLiteClientProperties;
+import com.github.sahara3.ssolite.spring.boot.autoconfigure.SsoLiteClientProperties;
+import com.github.sahara3.ssolite.spring.client.ExternalAuthenticationEntryPoint;
+import com.github.sahara3.ssolite.spring.client.SsoLiteAccessTokenAuthenticationProvider;
+import com.github.sahara3.ssolite.spring.client.SsoLiteClientLoginConfigurer;
 
 /**
  * Sample web security configuration for SSOLite client.

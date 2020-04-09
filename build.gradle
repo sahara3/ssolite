@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.0.RELEASE'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.9.RELEASE'
         classpath 'com.github.spotbugs:spotbugs-gradle-plugin:3.0.0'
         classpath 'com.github.sahara3:gradle-tomcat-runner-plugin:0.2.1'
     }
@@ -34,10 +34,28 @@ configure(allprojects) {
             dependency 'javax.servlet:javax.servlet-api:3.1.0'
             dependency 'javax.validation:validation-api:2.0.0.Final'
             dependency 'com.google.code.findbugs:jsr305:3.0.2'
+            dependency 'org.dmfs:rfc3986-uri:0.8.1'
 
             dependency 'com.squareup.okhttp3:okhttp:3.10.0'
 
             dependency 'org.apache.struts:struts2-core:2.5.14.1'
+        }
+    }
+
+    task configurations {
+        group = 'help'
+        description = "Displays all configurations declared in project '${project.path}'."
+        doLast {
+            println '-' * 60
+            println "Project ${project.path}"
+            println '-' * 60
+            configurations.each { configuration ->
+                println ''
+                println "- ${configuration.name}"
+                if (!configuration.extendsFrom.empty) {
+                    println "  - extends from: ${configuration.extendsFrom.collect { it.name }.join(', ')}"
+                }
+            }
         }
     }
 }
@@ -63,10 +81,40 @@ configure(subprojects) {
         ]
     }
 
+    configurations {
+        javadocLink {
+            extendsFrom apiElements
+        }
+    }
+
     tasks.withType(Javadoc) {
-        options.encoding = javaEncoding
         options.charSet = javaEncoding
-        options.links 'http://docs.oracle.com/javase/8/docs/api/'
+        options.encoding = javaEncoding
+        options.docEncoding = javaEncoding
+        options.links 'https://docs.oracle.com/javase/8/docs/api/'
+    }
+
+    tasks.withType(Javadoc) { task ->
+        task.doFirst {
+            def urlPrefix = 'https://javadoc.io/doc'
+
+            configurations.javadocLink.resolvedConfiguration.resolvedArtifacts.findAll {
+                !(it.id.componentIdentifier instanceof ProjectComponentIdentifier)
+            }.collect {
+                it.moduleVersion.id
+            }.each {
+                task.options.links "${urlPrefix}/${it.group}/${it.name}/${it.version}/"
+            }
+
+            configurations.javadocLink.resolvedConfiguration.resolvedArtifacts.findAll {
+                it.id.componentIdentifier instanceof ProjectComponentIdentifier
+            }.each {
+                def m = it.moduleVersion.id
+                def url = "${urlPrefix}/${m.group}/${m.name}/${m.version}/"
+                def dir = project(it.id.componentIdentifier.projectPath).tasks.javadoc.destinationDir
+                task.options.linksOffline url, dir.path
+            }
+        }
     }
 
     tasks.clean.doLast {
@@ -158,7 +206,7 @@ configure(subprojects) {
             reports.xml.enabled = false
             reports.html.enabled = true
 
-            classpath += files(configurations.compileOnly.resolvedConfiguration.files)
+            classpath += files(configurations.compileClasspath.resolvedConfiguration.files)
             spotbugsClasspath += files(configurations.spotbugsLogging.resolvedConfiguration.files)
         }
     }
@@ -167,7 +215,7 @@ configure(subprojects) {
 // ===================================================================
 //  ssolite
 // ===================================================================
-def mainProjects = subprojects.findAll { it.path.startsWith(':ssolite') }
+def mainProjects = subprojects.findAll { it.path.startsWith(':ssolite-') }
 
 configure(mainProjects) {
     group = 'com.github.sahara3'
@@ -180,27 +228,32 @@ configure(mainProjects) {
     }
 
     apply plugin: 'java-library'
+    apply plugin: 'jacoco'
 
     java {
         withJavadocJar()
         withSourcesJar()
     }
 
-    dependencies {
-        compileOnly 'javax.servlet:javax.servlet-api'
-        compileOnly 'com.google.code.findbugs:jsr305'
+    configurations {
+        providedApi
+        apiElements.extendsFrom providedApi
+        compileClasspath.extendsFrom providedApi
+        runtimeClasspath.extendsFrom providedApi
+        testCompileClasspath.extendsFrom providedApi
+        testRuntimeClasspath.extendsFrom providedApi
+    }
 
-        api 'org.springframework.security:spring-security-web'
-        api 'org.springframework.security:spring-security-config'
-        implementation 'org.springframework:spring-web'
-        implementation 'org.springframework.boot:spring-boot'
-        implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    dependencies {
+        providedApi 'javax.servlet:javax.servlet-api'
+        compileOnly 'com.google.code.findbugs:jsr305'
         implementation 'org.slf4j:slf4j-api'
 
         testImplementation('org.springframework.boot:spring-boot-starter-test') {
             exclude group: 'junit', module: 'junit'
         }
         testImplementation 'org.junit.jupiter:junit-jupiter-api'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     }
 
@@ -213,6 +266,15 @@ configure(mainProjects) {
 
     test {
         useJUnitPlatform()
+        finalizedBy(jacocoTestReport)
+    }
+
+    jacocoTestReport {
+        reports {
+            xml.enabled false
+            csv.enabled false
+            html.enabled true
+        }
     }
 
     // ---------------------------------------------------------------
@@ -224,17 +286,19 @@ configure(mainProjects) {
         publications {
             ssolite(MavenPublication) {
                 from components.java
+
                 versionMapping {
                     usage('java-api') {
-                        fromResolutionOf('runtimeClasspath')
+                        fromResolutionResult()
                     }
                     usage('java-runtime') {
                         fromResolutionResult()
                     }
                 }
+
                 pom {
-                    name = 'SSOLite'
-                    description = 'A lightweight single sign on library'
+                    name = project.name.split('-').collect {
+                         (it == 'ssolite') ? 'SSOLite' : it.capitalize() }.join(' ')
                     url = 'https://github.com/sahara3/ssolite'
                     licenses {
                         license {
@@ -254,27 +318,102 @@ configure(mainProjects) {
                         developerConnection = 'scm:git:git://github.com/sahara3/ssolite.git'
                         url = 'https://github.com/sahara3/ssolite'
                     }
+
+                    // providedApi -> provided scope
+                    withXml {
+                        asNode().dependencies.'*'.findAll {
+                            project.configurations.providedApi.allDependencies.find { dep ->
+                                // println "${dep.name} v.s. ${it.artifactId.text()}"
+                                dep.name == it.artifactId.text()
+                            }
+                        }.each {
+                            it.scope*.value = 'provided'
+                        }
+                    }
                 }
             }
         }
         repositories {
             maven {
                 url mavenPrivateUrl
-                credentials {
-                    username mavenPrivateUsername
-                    password mavenPrivatePassword
-                }
             }
         }
+        if (!mavenPrivateUrl.startsWith('file://')) {
+            repositories.maven.credentials {
+                username mavenPrivateUsername
+                password mavenPrivatePassword
+            }
+        }
+    }
+
+    afterEvaluate {
+        publishing.publications.ssolite.pom.description = description
+    }
+}
+
+configure(project(':ssolite-core')) {
+    description = 'A lightweight single sign on library (core module)'
+
+    dependencies {
+        implementation 'org.dmfs:rfc3986-uri'
+
+        testImplementation 'org.springframework.security:spring-security-web'
+    }
+}
+
+configure(project(':ssolite-spring')) {
+    description = 'A lightweight single sign on library (for Spring)'
+
+    dependencies {
+        api project(':ssolite-core')
+        api 'org.springframework.security:spring-security-core'
+        api 'org.springframework.security:spring-security-web'
+        api 'org.springframework.security:spring-security-config'
+        implementation 'org.springframework:spring-core'
+        implementation 'org.springframework:spring-web'
+    }
+}
+
+configure(project(':ssolite-spring-boot-autoconfigure')) {
+    description = 'A lightweight single sign on library (auto-configuration for Spring Boot)'
+
+    dependencies {
+        implementation project(':ssolite-core')
+        implementation project(':ssolite-spring')
+        implementation 'org.springframework:spring-core'
+        implementation 'org.springframework:spring-context'
+        implementation 'org.springframework.boot:spring-boot'
+        implementation 'org.springframework.boot:spring-boot-autoconfigure'
+        implementation 'org.springframework.security:spring-security-config'
+
+        compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+    }
+}
+
+configure(project(':ssolite-spring-boot-starter')) {
+    description = 'A lightweight single sign on library (starter for Spring Boot)'
+
+    dependencies {
+        api project(':ssolite-core')
+        api project(':ssolite-spring')
+        api project(':ssolite-spring-boot-autoconfigure')
     }
 }
 
 // ===================================================================
 //  Sample Server and Client
 // ===================================================================
-def sampleProjects = subprojects.findAll { it.path.startsWith(':sample') }
+def sampleSpringProjects = subprojects.findAll {
+    it.path.startsWith(':sample-') && it.path.endsWith('-spring')
+}
 
-configure(sampleProjects) {
+def sampleStrutsProjects = subprojects.findAll {
+    it.path.startsWith(':sample-') && it.path.endsWith('-struts2')
+}
+
+def allSampleProjects = sampleSpringProjects + sampleStrutsProjects
+
+configure(allSampleProjects) {
     dependencies {
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
@@ -282,68 +421,56 @@ configure(sampleProjects) {
         testAnnotationProcessor 'org.projectlombok:lombok'
 
         implementation 'javax.validation:validation-api'
-        implementation project(':ssolite')
-    }
-
-    task delombok(type: JavaExec, dependsOn: compileJava) {
-        ext.outputDir = file("${buildDir}/delombok")
-        outputs.dir outputDir
-
-        classpath configurations.compile, configurations.compileOnly
-        main = 'lombok.launch.Main'
-        args 'delombok'
-        sourceSets.main.java.srcDirs.each {
-            inputs.dir it
-            args it, '-d', outputDir
-        }
     }
 
     tasks.withType(Javadoc) {
-        dependsOn delombok
-        source = delombok.outputDir
+        enabled = false
     }
 }
 
-project(':sample-server') {
+configure(sampleSpringProjects) {
     apply plugin: 'org.springframework.boot'
 
     dependencies {
+        implementation project(':ssolite-spring-boot-starter')
         implementation 'javax.servlet:javax.servlet-api'
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+        implementation 'org.slf4j:slf4j-api'
+    }
+}
+
+configure(project(':sample-server-spring')) {
+    dependencies {
         implementation 'org.springframework.session:spring-session-core'
-        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
-        implementation 'org.slf4j:slf4j-api'
     }
 }
 
-project(':sample-client-spring') {
-    apply plugin: 'org.springframework.boot'
-
-    dependencies {
-        implementation 'javax.servlet:javax.servlet-api'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-        implementation 'org.springframework.boot:spring-boot-starter-security'
-        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity4'
-        implementation 'org.slf4j:slf4j-api'
-    }
+configure(project(':sample-client-spring')) {
+    // nothing to add.
 }
 
-project(':sample-client-struts2') {
+configure(sampleStrutsProjects) {
     apply plugin: 'war'
     apply plugin: 'com.github.sahara3.tomcat-runner'
 
     dependencies {
         compileOnly 'javax.servlet:javax.servlet-api'
 
+        implementation project(':ssolite-core')
         implementation 'org.apache.struts:struts2-core'
-        implementation 'com.squareup.okhttp3:okhttp'
-        implementation 'com.fasterxml.jackson.core:jackson-databind'
         implementation 'org.slf4j:slf4j-api'
         runtimeOnly 'ch.qos.logback:logback-classic'
         runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j'
+    }
+}
+
+configure(project(':sample-client-struts2')) {
+    dependencies {
+        implementation 'com.squareup.okhttp3:okhttp'
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
     }
 
     spotbugs {

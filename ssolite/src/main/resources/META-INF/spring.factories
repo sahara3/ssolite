@@ -1,3 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.sahara3.ssolite.config.SsoLiteServerAutoConfiguration,\
-com.github.sahara3.ssolite.config.SsoLiteClientAutoConfiguration
