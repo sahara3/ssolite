@@ -13,7 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import com.github.sahara3.ssolite.spring.boot.autoconfigure.SsoLiteServerProperties;
-import com.github.sahara3.ssolite.spring.server.service.SsoLiteServerRedirectResolver;
+import com.github.sahara3.ssolite.spring.server.SsoLiteServerRedirectResolver;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,7 +51,7 @@ public class WebMvcController {
         String from = request.getParameter("from");
 
         if (authentication != null && authentication.isAuthenticated() && from != null) {
-            String next = this.redirectResolver.getRedirectDestination(from, authentication);
+            String next = this.redirectResolver.resolveRedirectUrlOnSuccess(from, authentication);
             LOG.debug("Already logged in. Redirect to {}", next);
             return "redirect:" + next;
         }
