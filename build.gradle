@@ -338,7 +338,7 @@ configure(mainProjects) {
                 url mavenPrivateUrl
             }
         }
-        if (!mavenPrivateUrl.startsWith('file://')) {
+        if (mavenPrivateUrl != null && !mavenPrivateUrl.startsWith('file://')) {
             repositories.maven.credentials {
                 username mavenPrivateUsername
                 password mavenPrivatePassword
