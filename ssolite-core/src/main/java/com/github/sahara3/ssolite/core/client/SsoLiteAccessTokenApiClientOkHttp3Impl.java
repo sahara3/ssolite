@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
+import com.github.sahara3.ssolite.core.util.Assert;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -43,7 +44,9 @@ public class SsoLiteAccessTokenApiClientOkHttp3Impl implements SsoLiteAccessToke
     }
 
     @Override
-    public SsoLiteAccessToken retriveAccessToken(String url) throws SsoLiteAccessTokenApiException {
+    public SsoLiteAccessToken retriveAccessToken(String url)
+            throws IllegalArgumentException, SsoLiteAccessTokenApiException {
+        Assert.notNull(url, "url cannot be null");
         LOG.debug("GET {}", url);
 
         Request request = new Request.Builder().get().url(url).build();

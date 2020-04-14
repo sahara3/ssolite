@@ -4,6 +4,7 @@ package com.github.sahara3.ssolite.spring.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -30,7 +31,9 @@ public class SsoLiteAccessTokenApiClientRestTemplateImpl implements SsoLiteAcces
     }
 
     @Override
-    public SsoLiteAccessToken retriveAccessToken(String url) throws SsoLiteAccessTokenApiException {
+    public SsoLiteAccessToken retriveAccessToken(String url)
+            throws IllegalArgumentException, SsoLiteAccessTokenApiException {
+        Assert.notNull(url, "url cannot be null");
         LOG.debug("GET {}", url);
 
         try {

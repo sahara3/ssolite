@@ -19,7 +19,7 @@ public class SsoLiteUriUtils {
      *
      * @param uri the original URI.
      * @return the domain URI.
-     * @throws IllegalArgumentException thrown if uri is null.
+     * @throws IllegalArgumentException thrown if the {@code uri} is null.
      */
     public static URI getDomainUri(URI uri) throws IllegalArgumentException {
         Assert.notNull(uri, "uri cannot be null");
@@ -54,8 +54,8 @@ public class SsoLiteUriUtils {
      * @param text    the text to be encoded.
      * @param charset the string encoding character set.
      * @return the encoded query parameter.
-     * @throws IllegalArgumentException thrown if {@code text} or {@code charset} is {@code null}, or {@code charset} is
-     *                                  not supported.
+     * @throws IllegalArgumentException thrown if the {@code text} or {@code charset} is {@code null}, or the
+     *                                  {@code charset} is not supported.
      */
     public static String encodeQueryParam(String text, Charset charset) throws IllegalArgumentException {
         Assert.notNull(text, "text cannot be null");
