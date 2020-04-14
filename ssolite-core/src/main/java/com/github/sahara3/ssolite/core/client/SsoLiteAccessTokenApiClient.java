@@ -14,7 +14,7 @@ public interface SsoLiteAccessTokenApiClient {
      *
      * @param url the RESTful API URL for retrieving the access token.
      * @return SSOLite access token contains the authenticated username.
-     * @throws IllegalArgumentExcepiton       thrown if the {@code url} is {@code null}.
+     * @throws IllegalArgumentException       thrown if the {@code url} is {@code null}.
      * @throws SsoLiteAccessTokenApiException thrown if any HTTP error occurs, or access token is not found.
      */
     SsoLiteAccessToken retriveAccessToken(String url) throws IllegalArgumentException, SsoLiteAccessTokenApiException;
