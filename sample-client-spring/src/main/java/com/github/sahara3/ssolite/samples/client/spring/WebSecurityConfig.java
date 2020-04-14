@@ -1,7 +1,6 @@
 package com.github.sahara3.ssolite.samples.client.spring;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
+import com.github.sahara3.ssolite.core.client.SsoLiteAccessTokenApiClient;
 import com.github.sahara3.ssolite.spring.boot.autoconfigure.SsoLiteClientProperties;
 import com.github.sahara3.ssolite.spring.client.ExternalAuthenticationEntryPoint;
 import com.github.sahara3.ssolite.spring.client.SsoLiteAccessTokenAuthenticationProvider;
@@ -25,7 +25,7 @@ import com.github.sahara3.ssolite.spring.client.SsoLiteClientLoginConfigurer;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private RestTemplateBuilder restTemplateBuilder;
+    private SsoLiteAccessTokenApiClient ssoLiteAccessTokenApiClient;
 
     @Autowired
     private SsoLiteClientProperties ssoLiteClientProperties;
@@ -66,7 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // SSOLite authentication provider.
         SsoLiteAccessTokenAuthenticationProvider ssoProvider =
                 new SsoLiteAccessTokenAuthenticationProvider(this.ssoLiteClientProperties.getTokenApiUrl(),
-                        this.restTemplateBuilder.build(), auth.getDefaultUserDetailsService());
+                        this.ssoLiteAccessTokenApiClient, auth.getDefaultUserDetailsService());
         auth.authenticationProvider(ssoProvider);
     }
 

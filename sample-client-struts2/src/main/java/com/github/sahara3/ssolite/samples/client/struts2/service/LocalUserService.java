@@ -17,8 +17,7 @@ public class LocalUserService {
     }
 
     @SuppressWarnings("static-method")
-    @NotNull
-    public LocalUser findByName(String username) throws UserNotFoundException {
+    public @NotNull LocalUser findByName(String username) throws UserNotFoundException {
         // NOTE: this is a psuedo implementation.
         if ("admin".equals(username)) {
             LocalUser user = new LocalUser("admin", "struts2");

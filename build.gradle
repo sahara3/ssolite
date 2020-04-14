@@ -36,7 +36,7 @@ configure(allprojects) {
             dependency 'com.google.code.findbugs:jsr305:3.0.2'
             dependency 'org.dmfs:rfc3986-uri:0.8.1'
 
-            dependency 'com.squareup.okhttp3:okhttp:3.10.0'
+            dependency 'com.squareup.okhttp3:okhttp:3.14.7'
 
             dependency 'org.apache.struts:struts2-core:2.5.14.1'
         }
@@ -356,6 +356,8 @@ configure(project(':ssolite-core')) {
 
     dependencies {
         implementation 'org.dmfs:rfc3986-uri'
+        providedApi 'com.squareup.okhttp3:okhttp'
+        providedApi 'com.fasterxml.jackson.core:jackson-databind'
 
         testImplementation 'org.springframework.security:spring-security-web'
     }
