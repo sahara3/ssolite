@@ -10,6 +10,7 @@ buildscript {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.9.RELEASE'
         classpath 'com.github.spotbugs:spotbugs-gradle-plugin:3.0.0'
         classpath 'com.github.sahara3:gradle-tomcat-runner-plugin:0.2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
     }
 }
 
@@ -222,9 +223,14 @@ configure(mainProjects) {
     version = '1.0.0-SNAPSHOT'
 
     ext {
+        isSnapshotVersion = version.endsWith('-SNAPSHOT')
+
         mavenPrivateUrl = properties.get('maven.private.url', null)
         mavenPrivateUsername = properties.get('maven.private.username', null)
         mavenPrivatePassword = properties.get('maven.private.password', null)
+
+        bintrayUsername = properties.get('bintray.username', null)
+        bintrayApiKey = properties.get('bintray.apikey', null)
     }
 
     apply plugin: 'java-library'
@@ -281,6 +287,7 @@ configure(mainProjects) {
     // Maven Publising
     // ---------------------------------------------------------------
     apply plugin: 'maven-publish'
+    apply plugin: 'com.jfrog.bintray'
 
     publishing {
         publications {
@@ -333,21 +340,57 @@ configure(mainProjects) {
                 }
             }
         }
-        repositories {
-            maven {
-                url mavenPrivateUrl
+    }
+
+    if (isSnapshotVersion) {
+        if (mavenPrivateUrl != null) {
+            publishing.repositories {
+                maven {
+                    url mavenPrivateUrl
+                }
             }
-        }
-        if (mavenPrivateUrl != null && !mavenPrivateUrl.startsWith('file://')) {
-            repositories.maven.credentials {
-                username mavenPrivateUsername
-                password mavenPrivatePassword
+            if (!mavenPrivateUrl.startsWith('file://')) {
+                publishing.repositories.maven.credentials {
+                    username mavenPrivateUsername
+                    password mavenPrivatePassword
+                }
             }
         }
     }
 
     afterEvaluate {
         publishing.publications.ssolite.pom.description = description
+
+        bintray {
+            user = bintrayUsername
+            key = bintrayApiKey
+            publications = ['ssolite']
+            // dryRun = true
+
+            pkg {
+                repo = 'maven'
+                name = project.name
+                userOrg = 'ssolite'
+                desc = project.description
+                licenses = ['Apache-2.0']
+                websiteUrl = publishing.publications.ssolite.pom.url.get()
+                vcsUrl = "${publishing.publications.ssolite.pom.scm.url.get()}.git"
+                issueTrackerUrl = "${publishing.publications.ssolite.pom.url.get()}/issues"
+                publicDownloadNumbers = true
+                version {
+                    name = project.version
+                }
+            }
+        }
+
+        if (isSnapshotVersion) {
+            tasks.bintrayUpload.enabled = false
+            rootProject.tasks.bintrayUpload.enabled = false
+            rootProject.tasks.bintrayPublish.enabled = false
+        }
+        else {
+            tasks.publish.enabled = false
+        }
     }
 }
 
