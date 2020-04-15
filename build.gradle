@@ -96,6 +96,14 @@ configure(subprojects) {
     }
 
     tasks.withType(Javadoc) { task ->
+        ['Host', 'Port', 'User', 'Password'].each {
+            def key = "proxy${it}"
+            def value = System.properties.get("http.${key}")
+            if (value) {
+                task.options.jFlags "-D${key}=${value}"
+            }
+        }
+
         task.doFirst {
             def urlPrefix = 'https://javadoc.io/doc'
 
