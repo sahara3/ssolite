@@ -241,6 +241,12 @@ configure(mainProjects) {
         bintrayApiKey = properties.get('bintray.apikey', null)
     }
 
+    task showVersion {
+        doLast {
+            println version
+        }
+    }
+
     apply plugin: 'java-library'
     apply plugin: 'jacoco'
 
