@@ -251,11 +251,10 @@ configure(mainProjects) {
 
     configurations {
         providedApi
-        apiElements.extendsFrom providedApi
-        compileClasspath.extendsFrom providedApi
-        runtimeClasspath.extendsFrom providedApi
-        testCompileClasspath.extendsFrom providedApi
-        testRuntimeClasspath.extendsFrom providedApi
+        api.extendsFrom providedApi
+
+        optionalImplementation
+        implementation.extendsFrom optionalImplementation
     }
 
     dependencies {
@@ -334,15 +333,23 @@ configure(mainProjects) {
                         url = 'https://github.com/sahara3/ssolite'
                     }
 
-                    // providedApi -> provided scope
                     withXml {
+                        // providedApi -> provided scope
                         asNode().dependencies.'*'.findAll {
                             project.configurations.providedApi.allDependencies.find { dep ->
-                                // println "${dep.name} v.s. ${it.artifactId.text()}"
                                 dep.name == it.artifactId.text()
                             }
                         }.each {
                             it.scope*.value = 'provided'
+                        }
+
+                        // optionalImplementation -> optional=true
+                        asNode().dependencies.'*'.findAll {
+                            project.configurations.optionalImplementation.allDependencies.find { dep ->
+                                    dep.name == it.artifactId.text()
+                            }
+                        }.each {
+                            it.appendNode('optional').value = 'true'
                         }
                     }
                 }
@@ -407,8 +414,8 @@ configure(project(':ssolite-core')) {
 
     dependencies {
         implementation 'org.dmfs:rfc3986-uri'
-        providedApi 'com.squareup.okhttp3:okhttp'
-        providedApi 'com.fasterxml.jackson.core:jackson-databind'
+        optionalImplementation 'com.squareup.okhttp3:okhttp'
+        optionalImplementation 'com.fasterxml.jackson.core:jackson-databind'
 
         testImplementation 'org.springframework.security:spring-security-web'
     }
