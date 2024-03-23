@@ -3,15 +3,14 @@ package com.github.sahara3.ssolite.samples.client.struts2.interceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.opensymphony.xwork2.ActionInvocation;
+import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.struts2.ServletActionContext;
 
 import com.github.sahara3.ssolite.samples.client.struts2.model.AuthToken;
 import com.github.sahara3.ssolite.samples.client.struts2.service.AuthManager;
-import com.opensymphony.xwork2.ActionInvocation;
-import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
-
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class AuthInterceptor extends AbstractInterceptor {

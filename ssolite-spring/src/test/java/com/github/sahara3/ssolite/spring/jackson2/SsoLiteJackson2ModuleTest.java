@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,7 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.jackson2.CoreJackson2Module;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sahara3.ssolite.spring.client.SsoLiteAccessTokenAuthenticationToken;
 
 import static org.hamcrest.CoreMatchers.equalTo;

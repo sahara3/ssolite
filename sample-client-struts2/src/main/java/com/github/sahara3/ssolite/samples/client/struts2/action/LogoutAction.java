@@ -3,13 +3,12 @@ package com.github.sahara3.ssolite.samples.client.struts2.action;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import com.opensymphony.xwork2.ActionSupport;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import com.github.sahara3.ssolite.samples.client.struts2.service.AuthManager;
-import com.opensymphony.xwork2.ActionSupport;
-
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LogoutAction extends ActionSupport implements ServletRequestAware {

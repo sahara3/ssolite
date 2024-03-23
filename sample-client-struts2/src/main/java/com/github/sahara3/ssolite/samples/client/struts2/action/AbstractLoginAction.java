@@ -6,19 +6,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
+import com.opensymphony.xwork2.Action;
+import com.opensymphony.xwork2.ActionSupport;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
 import com.github.sahara3.ssolite.samples.client.struts2.model.AuthToken;
 import com.github.sahara3.ssolite.samples.client.struts2.service.AuthException;
 import com.github.sahara3.ssolite.samples.client.struts2.service.AuthManager;
-import com.opensymphony.xwork2.Action;
-import com.opensymphony.xwork2.ActionSupport;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractLoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {

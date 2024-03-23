@@ -3,6 +3,7 @@ package com.github.sahara3.ssolite.spring.jackson2;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import com.github.sahara3.ssolite.spring.client.SsoLiteAccessTokenAuthenticationToken;
 
 /**

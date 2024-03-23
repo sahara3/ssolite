@@ -2,6 +2,7 @@ package com.github.sahara3.ssolite.spring.jackson2;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import com.github.sahara3.ssolite.spring.client.SsoLiteAccessTokenAuthenticationToken;
 
 /**

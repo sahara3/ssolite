@@ -2,11 +2,11 @@ package com.github.sahara3.ssolite.samples.client.struts2.action;
 
 import javax.servlet.http.HttpSession;
 
+import lombok.Setter;
+
 import com.github.sahara3.ssolite.samples.client.struts2.interceptor.AuthInterceptor;
 import com.github.sahara3.ssolite.samples.client.struts2.model.AuthToken;
 import com.github.sahara3.ssolite.samples.client.struts2.service.AuthException;
-
-import lombok.Setter;
 
 public class LoginAction extends AbstractLoginAction {
 

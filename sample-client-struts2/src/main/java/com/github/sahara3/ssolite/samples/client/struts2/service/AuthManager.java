@@ -4,15 +4,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import com.github.sahara3.ssolite.samples.client.struts2.model.AuthToken;
-import com.github.sahara3.ssolite.samples.client.struts2.model.LocalUser;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+
+import com.github.sahara3.ssolite.samples.client.struts2.model.AuthToken;
+import com.github.sahara3.ssolite.samples.client.struts2.model.LocalUser;
 
 @Slf4j
 public class AuthManager {

@@ -1,3 +1,8 @@
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
+import com.github.spotbugs.snom.SpotBugsTask
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 buildscript {
     repositories {
         maven {
@@ -7,10 +12,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.0.9.RELEASE'
-        classpath 'com.github.spotbugs:spotbugs-gradle-plugin:3.0.0'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.7.18'
+        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.9'
         classpath 'com.github.sahara3:gradle-tomcat-runner-plugin:0.2.1'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
     }
 }
 
@@ -26,11 +30,11 @@ configure(allprojects) {
 
     dependencyManagement {
         imports {
-            mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+            mavenBom SpringBootPlugin.BOM_COORDINATES
         }
 
         dependencies {
-            dependency 'org.projectlombok:lombok:1.18.10'
+            dependency 'org.projectlombok:lombok:1.18.32'
 
             dependency 'javax.servlet:javax.servlet-api:3.1.0'
             dependency 'javax.validation:validation-api:2.0.0.Final'
@@ -43,7 +47,7 @@ configure(allprojects) {
         }
     }
 
-    task configurations {
+    tasks.register('configurations') {
         group = 'help'
         description = "Displays all configurations declared in project '${project.path}'."
         doLast {
@@ -63,23 +67,20 @@ configure(allprojects) {
 
 configure(subprojects) {
     apply plugin: 'java'
-    apply plugin: 'eclipse'
     apply plugin: 'com.github.spotbugs'
 
     ext {
         javaEncoding = 'UTF-8'
-        eclipseFormatterXml = file("${rootDir}/eclipse/formatter.xml")
     }
 
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
 
-    tasks.withType(AbstractCompile) {
+    tasks.withType(AbstractCompile).configureEach {
         options.encoding = javaEncoding
-        options.compilerArgs += [
-            '-Xlint:all', '-Xlint:-processing', '-Xlint:-fallthrough',
-            '-parameters'
-        ]
+        options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-Xlint:-fallthrough', '-parameters']
     }
 
     configurations {
@@ -88,14 +89,14 @@ configure(subprojects) {
         }
     }
 
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc).configureEach {
         options.charSet = javaEncoding
         options.encoding = javaEncoding
         options.docEncoding = javaEncoding
         options.links 'https://docs.oracle.com/javase/8/docs/api/'
     }
 
-    tasks.withType(Javadoc) { task ->
+    tasks.withType(Javadoc).configureEach { task ->
         ['Host', 'Port', 'User', 'Password'].each {
             def key = "proxy${it}"
             def value = System.properties.get("http.${key}")
@@ -130,77 +131,13 @@ configure(subprojects) {
         project.delete 'bin'
     }
 
-    eclipse {
-        project {
-            name = path.substring(1).replaceAll(':', '-')
-        }
-
-        classpath {
-            downloadSources = true
-            downloadJavadoc = true
-        }
-
-        jdt {
-            file {
-                withProperties { properties ->
-                    def profiles = new XmlSlurper().parse(eclipseFormatterXml)
-                    profiles.profile.setting.each { setting ->
-                        properties.setProperty("${setting.@id}", "${setting.@value}")
-                    }
-                }
-            }
-        }
-    }
-
-    tasks.eclipse.doLast {
-        def settingsDir = project.file('.settings')
-        if (!settingsDir.exists()) {
-            return
-        }
-
-        def update = { name, params ->
-            def properties = new Properties()
-            def settingFile = file("${settingsDir}/${name}")
-            if (settingFile.exists()) {
-                settingFile.withReader { r -> properties.load(r) }
-            }
-            else {
-                properties.setProperty('eclipse.preferences.version', '1')
-            }
-
-            params.each { k, v ->
-                properties.setProperty(k, v)
-            }
-            settingFile.withWriter { w -> properties.store(w, '') }
-        }
-
-        update('org.eclipse.core.runtime.prefs', [
-            'line.separator': '\\n',
-        ])
-        update('org.eclipse.core.resources.prefs', [
-            'encoding/<project>': javaEncoding,
-        ])
-
-        def profiles = new XmlSlurper().parse(eclipseFormatterXml)
-        update('org.eclipse.jdt.ui.prefs', [
-            'formatter_settings_version': "${profiles.profile.@version}",
-            'org.eclipse.jdt.ui.ignorelowercasenames': 'true',
-            'org.eclipse.jdt.ui.importorder': 'java;javax;org;com;',
-            'org.eclipse.jdt.ui.ondemandthreshold': '99',
-            'org.eclipse.jdt.ui.staticondemandthreshold': '99',
-        ])
-    }
-
-    tasks.cleanEclipse.doLast {
-        project.delete '.settings', '.classpath', '.project'
-    }
-
     spotbugs {
-        sourceSets = [sourceSets.main]
         ignoreFailures = false
-        effort = 'max'
-        reportLevel = 'low'
+        effort = Effort.valueOf('MAX')
+        reportLevel = Confidence.valueOf('LOW')
     }
+
+    spotbugsTest.enabled = false
 
     configurations {
         spotbugsLogging
@@ -210,14 +147,13 @@ configure(subprojects) {
         spotbugsLogging 'org.slf4j:slf4j-nop'
     }
 
-    afterEvaluate {
-        tasks.withType(com.github.spotbugs.SpotBugsTask) {
-            reports.xml.enabled = false
-            reports.html.enabled = true
-
-            classpath += files(configurations.compileClasspath.resolvedConfiguration.files)
-            spotbugsClasspath += files(configurations.spotbugsLogging.resolvedConfiguration.files)
+    tasks.withType(SpotBugsTask).configureEach {
+        reports {
+            xml.required = false
+            html.required = true
         }
+
+        spotbugsClasspath.from configurations.spotbugsLogging
     }
 }
 
@@ -228,7 +164,7 @@ def mainProjects = subprojects.findAll { it.path.startsWith(':ssolite-') }
 
 configure(mainProjects) {
     group = 'com.github.sahara3'
-    version = '1.0.0'
+    version = '2.0.0-SNAPSHOT'
 
     ext {
         isSnapshotVersion = version.endsWith('-SNAPSHOT')
@@ -236,12 +172,9 @@ configure(mainProjects) {
         mavenPrivateUrl = properties.get('maven.private.url', null)
         mavenPrivateUsername = properties.get('maven.private.username', null)
         mavenPrivatePassword = properties.get('maven.private.password', null)
-
-        bintrayUsername = properties.get('bintray.username', null)
-        bintrayApiKey = properties.get('bintray.apikey', null)
     }
 
-    task showVersion {
+    tasks.register('showVersion') {
         doLast {
             println version
         }
@@ -290,17 +223,16 @@ configure(mainProjects) {
 
     jacocoTestReport {
         reports {
-            xml.enabled false
-            csv.enabled false
-            html.enabled true
+            xml.required = false
+            csv.required = false
+            html.required = true
         }
     }
 
     // ---------------------------------------------------------------
-    // Maven Publising
+    // Maven Publishing
     // ---------------------------------------------------------------
     apply plugin: 'maven-publish'
-    apply plugin: 'com.jfrog.bintray'
 
     publishing {
         publications {
@@ -381,37 +313,6 @@ configure(mainProjects) {
 
     afterEvaluate {
         publishing.publications.ssolite.pom.description = description
-
-        bintray {
-            user = bintrayUsername
-            key = bintrayApiKey
-            publications = ['ssolite']
-            // dryRun = true
-
-            pkg {
-                repo = 'maven'
-                name = project.name
-                userOrg = 'ssolite'
-                desc = project.description
-                licenses = ['Apache-2.0']
-                websiteUrl = publishing.publications.ssolite.pom.url.get()
-                vcsUrl = "${publishing.publications.ssolite.pom.scm.url.get()}.git"
-                issueTrackerUrl = "${publishing.publications.ssolite.pom.url.get()}/issues"
-                publicDownloadNumbers = true
-                version {
-                    name = project.version
-                }
-            }
-        }
-
-        if (isSnapshotVersion) {
-            tasks.bintrayUpload.enabled = false
-            rootProject.tasks.bintrayUpload.enabled = false
-            rootProject.tasks.bintrayPublish.enabled = false
-        }
-        else {
-            tasks.publish.enabled = false
-        }
     }
 }
 
@@ -492,7 +393,7 @@ configure(allSampleProjects) {
         implementation 'javax.validation:validation-api'
     }
 
-    tasks.withType(Javadoc) {
+    tasks.withType(Javadoc).configureEach {
         enabled = false
     }
 }

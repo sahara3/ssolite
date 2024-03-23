@@ -1,10 +1,10 @@
 package com.github.sahara3.ssolite.samples.server.spring.controller;
 
 import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import com.github.sahara3.ssolite.spring.boot.autoconfigure.SsoLiteServerProperties;
 import com.github.sahara3.ssolite.spring.server.SsoLiteServerRedirectResolver;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * SSOLite server controller sample.

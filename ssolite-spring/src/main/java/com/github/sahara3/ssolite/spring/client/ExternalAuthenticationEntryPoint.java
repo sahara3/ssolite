@@ -2,7 +2,6 @@ package com.github.sahara3.ssolite.spring.client;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

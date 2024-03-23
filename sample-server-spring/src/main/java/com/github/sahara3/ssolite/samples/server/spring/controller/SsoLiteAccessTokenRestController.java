@@ -2,6 +2,8 @@ package com.github.sahara3.ssolite.samples.server.spring.controller;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,9 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
 import com.github.sahara3.ssolite.spring.server.service.SsoLiteAccessTokenService;
-
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 /**
  * RESTful API server controller sample.

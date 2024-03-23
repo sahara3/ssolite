@@ -1,19 +1,17 @@
 package com.github.sahara3.ssolite.samples.client.struts2.action;
 
 import java.nio.charset.StandardCharsets;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.struts2.interceptor.ServletRequestAware;
-
-import com.github.sahara3.ssolite.core.util.SsoLiteRedirectUrlBuilder;
-import com.github.sahara3.ssolite.core.util.SsoLiteUriUtils;
 import com.opensymphony.xwork2.ActionSupport;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.struts2.interceptor.ServletRequestAware;
+
+import com.github.sahara3.ssolite.core.util.SsoLiteRedirectUrlBuilder;
+import com.github.sahara3.ssolite.core.util.SsoLiteUriUtils;
 
 @Slf4j
 public class SsoLiteEntryPointAction extends ActionSupport implements ServletRequestAware {

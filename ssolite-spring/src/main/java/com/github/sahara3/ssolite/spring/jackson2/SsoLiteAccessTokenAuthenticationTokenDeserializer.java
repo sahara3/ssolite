@@ -3,8 +3,6 @@ package com.github.sahara3.ssolite.spring.jackson2;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -13,6 +11,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.springframework.security.core.GrantedAuthority;
+
 import com.github.sahara3.ssolite.spring.client.SsoLiteAccessTokenAuthenticationToken;
 
 /**

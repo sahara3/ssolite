@@ -2,16 +2,15 @@ package com.github.sahara3.ssolite.core.client;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
-import com.github.sahara3.ssolite.core.util.Assert;
-
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
+import com.github.sahara3.ssolite.core.util.Assert;
 
 /**
  * {@link SsoLiteAccessTokenApiClient} implementation using OkHttp3.

@@ -2,7 +2,6 @@ package com.github.sahara3.ssolite.core.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,6 @@
 package com.github.sahara3.ssolite.samples.client.spring.controller;
 
 import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;

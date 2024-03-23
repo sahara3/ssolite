@@ -2,12 +2,12 @@ package com.github.sahara3.ssolite.samples.client.struts2.service;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.github.sahara3.ssolite.core.client.SsoLiteAccessTokenApiClient;
 import com.github.sahara3.ssolite.core.client.SsoLiteAccessTokenApiClientOkHttp3Impl;
 import com.github.sahara3.ssolite.core.client.SsoLiteAccessTokenApiException;
 import com.github.sahara3.ssolite.core.model.SsoLiteAccessToken;
-
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SsoLiteAccessTokenService {
