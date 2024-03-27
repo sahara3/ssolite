@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +39,7 @@ public class SsoLiteAccessTokenApiClientOkHttp3Impl implements SsoLiteAccessToke
      * Constructor using default {@link OkHttpClient} and {@link ObjectMapper}.
      */
     public SsoLiteAccessTokenApiClientOkHttp3Impl() {
-        this.httpClient = new OkHttpClient.Builder().build();
-        this.objectMapper = new ObjectMapper();
+        this(new OkHttpClient.Builder().build(), new ObjectMapper());
     }
 
     @Override
@@ -53,10 +53,15 @@ public class SsoLiteAccessTokenApiClientOkHttp3Impl implements SsoLiteAccessToke
             LOG.debug("Token API response: {}", response);
             if (!response.isSuccessful()) {
                 LOG.debug("Access token is not found, or HTTP error.");
-                throw new SsoLiteAccessTokenApiException("error in retrive access token.");
+                throw new SsoLiteAccessTokenApiException("error in retrieve access token.");
             }
 
-            String json = response.body().string();
+            ResponseBody body = response.body();
+            if (body == null) {
+                LOG.warn("No response body.");
+                throw new SsoLiteAccessTokenApiException("error in retrieve access token.");
+            }
+            String json = body.string();
             return this.objectMapper.readValue(json, SsoLiteAccessToken.class);
         }
         catch (IOException e) {

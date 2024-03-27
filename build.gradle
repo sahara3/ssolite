@@ -12,9 +12,10 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.7.18'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.0.13'
+        classpath 'io.spring.gradle:dependency-management-plugin:1.1.4'
         classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.9'
-        classpath 'com.github.sahara3:gradle-tomcat-runner-plugin:0.2.1'
+        classpath 'com.github.sahara3:gradle-tomcat-runner-plugin:0.3.0'
     }
 }
 
@@ -36,14 +37,16 @@ configure(allprojects) {
         dependencies {
             dependency 'org.projectlombok:lombok:1.18.32'
 
+            dependency 'jakarta.servlet:jakarta.servlet-api:6.0.0'
             dependency 'javax.servlet:javax.servlet-api:3.1.0'
-            dependency 'javax.validation:validation-api:2.0.0.Final'
+            dependency 'jakarta.validation:jakarta.validation-api:3.0.2'
             dependency 'com.google.code.findbugs:jsr305:3.0.2'
             dependency 'org.dmfs:rfc3986-uri:0.8.1'
 
-            dependency 'com.squareup.okhttp3:okhttp:3.14.7'
+            dependency 'com.squareup.okhttp3:okhttp:4.12.0'
+            dependency 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23'
 
-            dependency 'org.apache.struts:struts2-core:2.5.14.1'
+            dependency 'org.apache.struts:struts2-core:6.3.0.2'
         }
     }
 
@@ -74,8 +77,8 @@ configure(subprojects) {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     tasks.withType(AbstractCompile).configureEach {
@@ -93,7 +96,8 @@ configure(subprojects) {
         options.charSet = javaEncoding
         options.encoding = javaEncoding
         options.docEncoding = javaEncoding
-        options.links 'https://docs.oracle.com/javase/8/docs/api/'
+        options.links 'https://docs.oracle.com/en/java/javase/17/docs/api/'
+        options.addBooleanOption 'Xdoclint:-missing', true
     }
 
     tasks.withType(Javadoc).configureEach { task ->
@@ -112,6 +116,9 @@ configure(subprojects) {
                 !(it.id.componentIdentifier instanceof ProjectComponentIdentifier)
             }.collect {
                 it.moduleVersion.id
+            }.findAll {
+                it.group != 'org.jetbrains.kotlin' &&
+                        it.module.name != 'okhttp' && it.module.name != 'okio-jvm'
             }.each {
                 task.options.links "${urlPrefix}/${it.group}/${it.name}/${it.version}/"
             }
@@ -139,21 +146,17 @@ configure(subprojects) {
 
     spotbugsTest.enabled = false
 
-    configurations {
-        spotbugsLogging
-    }
-
-    dependencies {
-        spotbugsLogging 'org.slf4j:slf4j-nop'
-    }
-
     tasks.withType(SpotBugsTask).configureEach {
         reports {
             xml.required = false
             html.required = true
         }
+    }
 
-        spotbugsClasspath.from configurations.spotbugsLogging
+    if (file('spotbugs-exclude.xml').exists()) {
+        spotbugs {
+            excludeFilter = file('spotbugs-exclude.xml')
+        }
     }
 }
 
@@ -183,20 +186,24 @@ configure(mainProjects) {
     apply plugin: 'java-library'
     apply plugin: 'jacoco'
 
-    java {
-        withJavadocJar()
-        withSourcesJar()
-    }
-
     configurations {
         providedApi
-        api.extendsFrom providedApi
-
         optionalImplementation
-        implementation.extendsFrom optionalImplementation
+    }
+
+    sourceSets {
+        main {
+            compileClasspath += configurations.providedApi
+            compileClasspath += configurations.optionalImplementation
+        }
+        test {
+            compileClasspath += configurations.providedApi
+            compileClasspath += configurations.optionalImplementation
+        }
     }
 
     dependencies {
+        providedApi 'jakarta.servlet:jakarta.servlet-api'
         providedApi 'javax.servlet:javax.servlet-api'
         compileOnly 'com.google.code.findbugs:jsr305'
         implementation 'org.slf4j:slf4j-api'
@@ -207,6 +214,13 @@ configure(mainProjects) {
         testImplementation 'org.junit.jupiter:junit-jupiter-api'
         testImplementation 'org.junit.jupiter:junit-jupiter-params'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+        testRuntimeOnly 'jakarta.servlet:jakarta.servlet-api'
+        testRuntimeOnly 'javax.servlet:javax.servlet-api'
+    }
+
+    java {
+        withJavadocJar()
+        withSourcesJar()
     }
 
     jar {
@@ -320,6 +334,7 @@ configure(project(':ssolite-core')) {
     description = 'A lightweight single sign on library (core module)'
 
     dependencies {
+        compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
         implementation 'org.dmfs:rfc3986-uri'
         optionalImplementation 'com.squareup.okhttp3:okhttp'
         optionalImplementation 'com.fasterxml.jackson.core:jackson-databind'
@@ -341,6 +356,7 @@ configure(project(':ssolite-spring')) {
         api 'com.fasterxml.jackson.core:jackson-annotations'
         implementation 'org.springframework:spring-core'
         implementation 'org.springframework:spring-web'
+        optionalImplementation 'org.springframework.boot:spring-boot-starter-actuator'
     }
 }
 
@@ -389,8 +405,9 @@ configure(allSampleProjects) {
         annotationProcessor 'org.projectlombok:lombok'
         testCompileOnly 'org.projectlombok:lombok'
         testAnnotationProcessor 'org.projectlombok:lombok'
+        compileOnly 'com.google.code.findbugs:jsr305'
 
-        implementation 'javax.validation:validation-api'
+        implementation 'jakarta.validation:jakarta.validation-api'
     }
 
     tasks.withType(Javadoc).configureEach {
@@ -403,12 +420,17 @@ configure(sampleSpringProjects) {
 
     dependencies {
         implementation project(':ssolite-spring-boot-starter')
-        implementation 'javax.servlet:javax.servlet-api'
+        implementation 'jakarta.servlet:jakarta.servlet-api'
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
         implementation 'org.springframework.boot:spring-boot-starter-security'
-        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
         implementation 'org.slf4j:slf4j-api'
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    }
+
+    bootRun {
+        systemProperty 'java.net.preferIPv4Stack', 'true'
     }
 }
 
@@ -432,8 +454,12 @@ configure(sampleStrutsProjects) {
         implementation project(':ssolite-core')
         implementation 'org.apache.struts:struts2-core'
         implementation 'org.slf4j:slf4j-api'
-        runtimeOnly 'ch.qos.logback:logback-classic'
-        runtimeOnly 'org.apache.logging.log4j:log4j-to-slf4j'
+        runtimeOnly 'org.apache.logging.log4j:log4j-slf4j2-impl'
+        runtimeOnly 'org.apache.logging.log4j:log4j-core'
+
+        tomcat 'org.apache.logging.log4j:log4j-slf4j2-impl'
+        tomcat 'org.apache.logging.log4j:log4j-core'
+        tomcat 'org.slf4j:jul-to-slf4j'
     }
 }
 
@@ -443,16 +469,16 @@ configure(project(':sample-client-struts2')) {
         implementation 'com.fasterxml.jackson.core:jackson-databind'
     }
 
-    spotbugs {
-        excludeFilter = file('spotbugs-exclude.xml')
-    }
-
     // run this on tomcat.
     tomcat {
-        version = 9.0
+        version = '9.0.87'
         port = 8081
         webapp(project) {
             contextPath = ''
         }
+    }
+
+    tomcatRun {
+        systemProperty 'java.net.preferIPv4Stack', 'true'
     }
 }

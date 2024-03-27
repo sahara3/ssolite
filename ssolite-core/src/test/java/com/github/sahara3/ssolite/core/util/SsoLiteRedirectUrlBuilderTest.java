@@ -2,8 +2,8 @@ package com.github.sahara3.ssolite.core.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -85,8 +85,8 @@ class SsoLiteRedirectUrlBuilderTest {
             return new HttpServletRequestGenerator(method, requestUrl).generate(internal);
         }
 
-        private String method;
-        private String requestUrl;
+        private final String method;
+        private final String requestUrl;
 
         HttpServletRequestGenerator(String method, String requestUrl) {
             this.method = method;

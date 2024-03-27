@@ -1,19 +1,19 @@
 package com.github.sahara3.ssolite.samples.client.struts2.action;
 
+import java.io.Serial;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.constraints.NotNull;
 
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionSupport;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.struts2.interceptor.ServletRequestAware;
-import org.apache.struts2.interceptor.ServletResponseAware;
+import org.apache.struts2.action.ServletRequestAware;
+import org.apache.struts2.action.ServletResponseAware;
 
 import com.github.sahara3.ssolite.samples.client.struts2.model.AuthToken;
 import com.github.sahara3.ssolite.samples.client.struts2.service.AuthException;
@@ -22,15 +22,24 @@ import com.github.sahara3.ssolite.samples.client.struts2.service.AuthManager;
 @Slf4j
 public abstract class AbstractLoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Getter(AccessLevel.PROTECTED)
-    @Setter
     private HttpServletRequest servletRequest;
 
+    @Override
+    public void withServletRequest(HttpServletRequest request) {
+        this.servletRequest = request;
+    }
+
     @Getter(AccessLevel.PROTECTED)
-    @Setter
     private HttpServletResponse servletResponse;
+
+    @Override
+    public void withServletResponse(HttpServletResponse response) {
+        this.servletResponse = response;
+    }
 
     @Getter
     private String redirectUrl;

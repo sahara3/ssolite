@@ -119,7 +119,6 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
         return this.createSuccessAuthentication(authentication, user);
     }
 
-    @SuppressWarnings("static-method")
     protected Authentication createSuccessAuthentication(Authentication authentication, UserDetails user) {
         SsoLiteAccessTokenAuthenticationToken result =
                 new SsoLiteAccessTokenAuthenticationToken(user, authentication.getCredentials(), user.getAuthorities());
@@ -128,7 +127,7 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
     }
 
     protected final UserDetails retrieveUser(String accessTokenId) throws AuthenticationException {
-        if (accessTokenId == null || accessTokenId.isEmpty()) {
+        if (accessTokenId.isEmpty()) {
             LOG.debug("Invalid access token ID: {}", accessTokenId);
             throw new BadCredentialsException("Bad credentials.");
         }
@@ -148,7 +147,7 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
         }
 
         // retrieve the local user details object via UserDetailsService.
-        UserDetails loadedUser = null;
+        UserDetails loadedUser;
         try {
             loadedUser = this.getUserDetailsService().loadUserByUsername(token.getUsername());
         }
@@ -166,6 +165,11 @@ public class SsoLiteAccessTokenAuthenticationProvider implements AuthenticationP
         return loadedUser;
     }
 
+    /**
+     * Default implementation of {@link UserDetailsChecker}.
+     *
+     * @author sahara3
+     */
     protected static class DefaultAuthenticationChecks implements UserDetailsChecker {
         @Override
         public void check(UserDetails user) {

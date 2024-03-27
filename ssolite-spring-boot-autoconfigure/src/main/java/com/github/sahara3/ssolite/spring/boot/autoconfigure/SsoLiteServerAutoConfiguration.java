@@ -17,15 +17,14 @@ import com.github.sahara3.ssolite.spring.server.service.SsoLiteAccessTokenServic
 import com.github.sahara3.ssolite.spring.server.service.SsoLiteAccessTokenServiceImpl;
 
 /**
- * Server auto configuration for SSOLite.
+ * Server auto-configuration for SSOLite.
  *
  * @author sahara3
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(EnableWebSecurity.class)
 @ConditionalOnProperty(prefix = "ssolite.server", name = "enabled", havingValue = "true", matchIfMissing = false)
 @EnableConfigurationProperties(SsoLiteServerProperties.class)
-@SuppressWarnings("static-method")
 public class SsoLiteServerAutoConfiguration {
 
     /**

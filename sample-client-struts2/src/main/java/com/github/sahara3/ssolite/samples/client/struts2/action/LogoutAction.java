@@ -1,22 +1,27 @@
 package com.github.sahara3.ssolite.samples.client.struts2.action;
 
+import java.io.Serial;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import com.opensymphony.xwork2.ActionSupport;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.action.ServletRequestAware;
 
 import com.github.sahara3.ssolite.samples.client.struts2.service.AuthManager;
 
 @Slf4j
 public class LogoutAction extends ActionSupport implements ServletRequestAware {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Setter
     private HttpServletRequest servletRequest;
+
+    @Override
+    public void withServletRequest(HttpServletRequest request) {
+        this.servletRequest = request;
+    }
 
     AuthManager authenticationManager = AuthManager.getInstance();
 

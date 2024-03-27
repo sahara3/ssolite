@@ -19,7 +19,7 @@ import com.github.sahara3.ssolite.spring.client.SsoLiteAccessTokenApiClientRestT
  *
  * @author sahara3
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(EnableWebSecurity.class)
 @AutoConfigureAfter(RestTemplateAutoConfiguration.class)
 @EnableConfigurationProperties(SsoLiteClientProperties.class)

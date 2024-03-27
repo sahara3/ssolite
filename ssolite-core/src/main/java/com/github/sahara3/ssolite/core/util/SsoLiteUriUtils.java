@@ -6,6 +6,8 @@ import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
 import org.dmfs.rfc3986.encoding.Encoded;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * URI utilities for SSOLIte.
@@ -13,6 +15,8 @@ import org.dmfs.rfc3986.encoding.Encoded;
  * @author sahara3
  */
 public class SsoLiteUriUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SsoLiteUriUtils.class);
 
     /**
      * Returns a domain URI.
@@ -62,5 +66,44 @@ public class SsoLiteUriUtils {
         Assert.notNull(charset, "charset cannot be null");
         Encoded encoded = new Encoded(text, charset.name());
         return encoded.toString();
+    }
+
+    /**
+     * Builds redirect URL and return it.
+     *
+     * @param url         the URL to redirect.
+     * @param schema      the schema of the current request.
+     * @param serverName  the server name of the current request.
+     * @param serverPort  the server port of the current request.
+     * @param contextPath the context path of the current request.
+     * @return the redirect URL.
+     */
+    static String buildRedirectUrl(String url, String schema, String serverName, int serverPort, String contextPath) {
+        if (SsoLiteUriUtils.isAbsoluteUrl(url)) {
+            LOG.debug("URL is absolute: {}", url);
+            return url;
+        }
+
+        boolean internal = false;
+        String path = url;
+        if (url.startsWith("internal:")) {
+            path = url.substring("internal:".length());
+            internal = true;
+        }
+
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append(schema).append("://").append(serverName);
+
+        if (serverPort != -1 && serverPort != ("http".equals(schema) ? 80 : 443)) {
+            urlBuilder.append(':').append(serverPort);
+        }
+        if (internal) {
+            urlBuilder.append(contextPath);
+        }
+        urlBuilder.append(path);
+        String redirectUrl = urlBuilder.toString();
+
+        LOG.debug("Redirect URL: {} => {}", url, redirectUrl);
+        return redirectUrl;
     }
 }

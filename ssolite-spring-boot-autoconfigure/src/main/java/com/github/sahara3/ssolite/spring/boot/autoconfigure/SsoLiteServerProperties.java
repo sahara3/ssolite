@@ -51,6 +51,13 @@ public class SsoLiteServerProperties {
         return this.permittedDomains;
     }
 
+    /**
+     * @param permittedDomains the list of the permitted domain URLs.
+     */
+    public void setPermittedDomains(List<String> permittedDomains) {
+        this.permittedDomains = permittedDomains;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(this.defaultTopPageUrl, this.permittedDomains);

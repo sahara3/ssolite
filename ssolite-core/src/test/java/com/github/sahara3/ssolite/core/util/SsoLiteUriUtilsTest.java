@@ -16,7 +16,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.emptyString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SsoLiteUriUtilsTest {
@@ -33,7 +33,7 @@ class SsoLiteUriUtilsTest {
         assertThat(result.getPort(), is(equalTo(uri.getPort())));
 
         assertThat(result.getUserInfo(), is(nullValue()));
-        assertThat(result.getPath(), isEmptyString());
+        assertThat(result.getPath(), is(emptyString()));
         assertThat(result.getQuery(), is(nullValue()));
         assertThat(result.getFragment(), is(nullValue()));
     }

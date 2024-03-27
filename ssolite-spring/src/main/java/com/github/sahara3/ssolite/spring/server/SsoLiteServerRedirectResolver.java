@@ -7,8 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -50,23 +50,23 @@ public class SsoLiteServerRedirectResolver {
         this.permittedDomainMap = permittedDomainMap;
     }
 
-    public void setPermittedDomains(List<String> permittedDomains) {
+    public void setPermittedDomains(@Nullable List<String> permittedDomains) {
         this.permittedDomainMap = new HashMap<>();
         if (permittedDomains == null) {
             return;
         }
 
-        permittedDomains.forEach(s -> {
+        for (String permittedDomain : permittedDomains) {
             try {
-                URI ssoLoginUri = new URI(s);
+                URI ssoLoginUri = new URI(permittedDomain);
                 URI domainUri = SsoLiteUriUtils.getDomainUri(ssoLoginUri);
                 this.permittedDomainMap.put(domainUri, ssoLoginUri);
-                LOG.debug("Permitted domain: {}", s);
+                LOG.debug("Permitted domain: {}", permittedDomain);
             }
             catch (URISyntaxException e) {
-                LOG.warn("Invalid URI: " + s, e);
+                LOG.warn("Invalid URI: " + permittedDomain, e);
             }
-        });
+        }
     }
 
     /**
@@ -186,7 +186,7 @@ public class SsoLiteServerRedirectResolver {
         return builder.toString();
     }
 
-    private Charset urlCharset = StandardCharsets.UTF_8;
+    private final Charset urlCharset = StandardCharsets.UTF_8;
 
     private String encodeQueryParam(String value) {
         Assert.notNull(value, "value cannot be null");

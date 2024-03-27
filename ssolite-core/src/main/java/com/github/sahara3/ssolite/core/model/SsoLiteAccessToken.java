@@ -10,10 +10,20 @@ import java.util.Objects;
  */
 public class SsoLiteAccessToken {
 
+    /**
+     * Empty constructor.
+     */
     public SsoLiteAccessToken() {
         // do nothing.
     }
 
+    /**
+     * Constructor with full parameters.
+     *
+     * @param id       the ID of this token.
+     * @param username the username of this token.
+     * @param expired  the expired datetime of this token.
+     */
     public SsoLiteAccessToken(String id, String username, OffsetDateTime expired) {
         this.id = id;
         this.username = username;

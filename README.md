@@ -24,7 +24,7 @@ $ ./gradlew sample-client-spring:bootRun
 ```
 You can access this server with http://127.0.0.1:8081/. You will see
 the server login page if the server is running. After entering the
-correct username and password, you will retern the client page.
+correct username and password, you will return the client page.
 
 This client sample also has local login mechanism. You can access
 http://127.0.0.1:8081/login to login with the client-local username
@@ -37,7 +37,7 @@ $ ./gradlew sample-client-struts2:tomcatRun
 ```
 You can access this server with http://127.0.0.1:8081/. You will see
 the server login page if the server is running. After entering the
-correct username and password, you will retern the client page.
+correct username and password, you will return the client page.
 
 This client sample also has local login mechanism. You can access
 http://127.0.0.1:8081/login to login with the client-local username

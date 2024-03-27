@@ -1,7 +1,6 @@
 package com.github.sahara3.ssolite.samples.server.spring.controller;
 
-import javax.validation.constraints.NotNull;
-
+import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

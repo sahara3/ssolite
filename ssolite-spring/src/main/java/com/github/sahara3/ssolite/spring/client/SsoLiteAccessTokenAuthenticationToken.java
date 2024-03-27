@@ -1,5 +1,6 @@
 package com.github.sahara3.ssolite.spring.client;
 
+import java.io.Serial;
 import java.util.Collection;
 
 import org.springframework.lang.Nullable;
@@ -13,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
  */
 public class SsoLiteAccessTokenAuthenticationToken extends AbstractAuthenticationToken {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Nullable

@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,15 +17,12 @@ import com.github.sahara3.ssolite.samples.client.struts2.model.LocalUser;
 @Slf4j
 public class AuthManager {
 
+    @Getter
     private static final AuthManager instance = new AuthManager();
-
-    public static AuthManager getInstance() {
-        return instance;
-    }
 
     public static final String SESSION_KEY_AUTHTOKEN = "my-auth-token";
 
-    private LocalUserService userService = LocalUserService.getInstance();
+    private final LocalUserService userService = LocalUserService.getInstance();
 
     public AuthToken authenticate(@NonNull HttpServletRequest request, String username, String password)
             throws AuthException {
@@ -60,24 +58,21 @@ public class AuthManager {
         return session;
     }
 
-    @SuppressWarnings("static-method")
     public AuthToken getAuthenticationToken(HttpSession session) {
         if (session == null) {
             return null;
         }
         Object token = session.getAttribute(SESSION_KEY_AUTHTOKEN);
-        if (token == null || !(token instanceof AuthToken)) {
+        if (!(token instanceof AuthToken)) {
             return null;
         }
         return (AuthToken) token;
     }
 
-    @SuppressWarnings("static-method")
-    protected void setAuthenticationToken(@NonNull HttpSession session, AuthToken token) {
+    private void setAuthenticationToken(@NonNull HttpSession session, AuthToken token) {
         session.setAttribute(SESSION_KEY_AUTHTOKEN, token);
     }
 
-    @SuppressWarnings("static-method")
     public void removeAuthenticationToken(HttpSession session) {
         if (session != null) {
             session.removeAttribute(SESSION_KEY_AUTHTOKEN);

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -26,15 +25,14 @@ public class SsoLiteAccessTokenAuthenticationTokenDeserializer
     @Override
     @SuppressWarnings("boxing")
     public SsoLiteAccessTokenAuthenticationToken deserialize(JsonParser jp, DeserializationContext ctxt)
-            throws IOException, JsonProcessingException {
-        SsoLiteAccessTokenAuthenticationToken token = null;
+            throws IOException {
         ObjectMapper mapper = (ObjectMapper) jp.getCodec();
         JsonNode jsonNode = mapper.readTree(jp);
 
-        Boolean authenticated = readJsonNode(jsonNode, "authenticated").asBoolean();
+        boolean authenticated = readJsonNode(jsonNode, "authenticated").asBoolean();
 
         JsonNode principalNode = readJsonNode(jsonNode, "principal");
-        Object principal = null;
+        Object principal;
         if (principalNode.isObject()) {
             principal = mapper.readValue(principalNode.traverse(mapper), Object.class);
         }
@@ -43,7 +41,7 @@ public class SsoLiteAccessTokenAuthenticationTokenDeserializer
         }
 
         JsonNode credentialsNode = readJsonNode(jsonNode, "credentials");
-        Object credentials;
+        String credentials;
         if (credentialsNode.isNull() || credentialsNode.isMissingNode()) {
             credentials = null;
         }
@@ -51,6 +49,7 @@ public class SsoLiteAccessTokenAuthenticationTokenDeserializer
             credentials = credentialsNode.asText();
         }
 
+        SsoLiteAccessTokenAuthenticationToken token;
         if (authenticated) {
             List<GrantedAuthority> authorities =
                     mapper.readValue(readJsonNode(jsonNode, "authorities").traverse(mapper),
@@ -61,7 +60,7 @@ public class SsoLiteAccessTokenAuthenticationTokenDeserializer
             if (credentials == null) {
                 throw new JsonMappingException(jp, "credentials must not be null when not authenticated.");
             }
-            token = new SsoLiteAccessTokenAuthenticationToken((String) credentials);
+            token = new SsoLiteAccessTokenAuthenticationToken(credentials);
         }
 
         JsonNode detailsNode = readJsonNode(jsonNode, "details");

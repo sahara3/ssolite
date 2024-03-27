@@ -1,0 +1,2 @@
+com.github.sahara3.ssolite.spring.boot.autoconfigure.SsoLiteServerAutoConfiguration
+com.github.sahara3.ssolite.spring.boot.autoconfigure.SsoLiteClientAutoConfiguration

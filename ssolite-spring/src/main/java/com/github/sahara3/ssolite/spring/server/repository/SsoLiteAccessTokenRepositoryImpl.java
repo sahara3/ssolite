@@ -21,8 +21,7 @@ public class SsoLiteAccessTokenRepositoryImpl implements SsoLiteAccessTokenRepos
     @Override
     public @Nullable SsoLiteAccessToken findById(String id) {
         Assert.notNull(id, "id cannot be null");
-        SsoLiteAccessToken token = this.tokens.get(id);
-        return token;
+        return this.tokens.get(id);
     }
 
     @Override

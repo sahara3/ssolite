@@ -30,7 +30,7 @@ public class SsoLiteLoginAction extends AbstractLoginAction {
     @Override
     protected AuthToken authenticate() throws AuthException {
         String url = this.getText("ssolite.token-api-url") + "/" + this.token;
-        SsoLiteAccessToken accessToken = this.ssoLiteAccessTokenService.retriveAccessToken(url);
+        SsoLiteAccessToken accessToken = this.ssoLiteAccessTokenService.retrieveAccessToken(url);
 
         try {
             // get the local user object via LocalUserService.

@@ -1,30 +1,35 @@
 package com.github.sahara3.ssolite.samples.client.struts2.action;
 
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 
 import com.opensymphony.xwork2.ActionSupport;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.action.ServletRequestAware;
 
-import com.github.sahara3.ssolite.core.util.SsoLiteRedirectUrlBuilder;
+import com.github.sahara3.ssolite.core.util.LegacySsoLiteRedirectUrlBuilder;
 import com.github.sahara3.ssolite.core.util.SsoLiteUriUtils;
 
 @Slf4j
 public class SsoLiteEntryPointAction extends ActionSupport implements ServletRequestAware {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @Setter
     private HttpServletRequest servletRequest;
+
+    @Override
+    public void withServletRequest(HttpServletRequest request) {
+        this.servletRequest = request;
+    }
 
     @Getter
     private String redirectUrl;
 
-    private final SsoLiteRedirectUrlBuilder urlBuilder = new SsoLiteRedirectUrlBuilder();
+    private final LegacySsoLiteRedirectUrlBuilder urlBuilder = new LegacySsoLiteRedirectUrlBuilder();
 
     @Override
     public String execute() throws Exception {
@@ -51,6 +56,8 @@ public class SsoLiteEntryPointAction extends ActionSupport implements ServletReq
     }
 
     private String generateFromUrl(boolean sameDomain) {
+        assert this.servletRequest != null;
+
         if (sameDomain) {
             String from = this.servletRequest.getRequestURI();
             String query = this.servletRequest.getQueryString();
