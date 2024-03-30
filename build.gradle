@@ -81,7 +81,7 @@ configure(subprojects) {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    tasks.withType(AbstractCompile).configureEach {
+    tasks.withType(JavaCompile).configureEach {
         options.encoding = javaEncoding
         options.compilerArgs += ['-Xlint:all', '-Xlint:-processing', '-Xlint:-fallthrough', '-parameters']
     }
@@ -171,10 +171,6 @@ configure(mainProjects) {
 
     ext {
         isSnapshotVersion = version.endsWith('-SNAPSHOT')
-
-        mavenPrivateUrl = properties.get('maven.private.url', null)
-        mavenPrivateUsername = properties.get('maven.private.username', null)
-        mavenPrivatePassword = properties.get('maven.private.password', null)
     }
 
     tasks.register('showVersion') {
@@ -247,6 +243,11 @@ configure(mainProjects) {
     // Maven Publishing
     // ---------------------------------------------------------------
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+
+    tasks.withType(PublishToMavenRepository).configureEach {
+        dependsOn test
+    }
 
     publishing {
         publications {
@@ -309,7 +310,12 @@ configure(mainProjects) {
         }
     }
 
+    afterEvaluate {
+        publishing.publications.ssolite.pom.description = description
+    }
+
     if (isSnapshotVersion) {
+        def mavenPrivateUrl = properties.get('maven.private.url', null)
         if (mavenPrivateUrl != null) {
             publishing.repositories {
                 maven {
@@ -317,16 +323,45 @@ configure(mainProjects) {
                 }
             }
             if (!mavenPrivateUrl.startsWith('file://')) {
+                def mavenPrivateUsername = properties.get('maven.private.username')
+                def mavenPrivatePassword = properties.get('maven.private.password')
                 publishing.repositories.maven.credentials {
                     username mavenPrivateUsername
                     password mavenPrivatePassword
                 }
             }
         }
+    } else {
+        def mavenSonatypeUrl = properties.get('maven.sonatype.url', null)
+        if (mavenSonatypeUrl != null) {
+            def mavenSonatypeUsername = properties.get('maven.sonatype.username')
+            def mavenSonatypePassword = properties.get('maven.sonatype.password')
+            publishing.repositories {
+                maven {
+                    name = 'sonatype'
+                    url = mavenSonatypeUrl
+                    credentials {
+                        username mavenSonatypeUsername
+                        password mavenSonatypePassword
+                    }
+                }
+            }
+        }
     }
 
-    afterEvaluate {
-        publishing.publications.ssolite.pom.description = description
+    def signingKey = properties.get('SIGNING_KEY', null)
+    def signingPassword = properties.get('SIGNING_PASSWORD', null)
+    def signingKeyId = properties.get('SIGNING_KEY_ID', null)
+    signing {
+        sign publishing.publications.ssolite
+
+        if (signingKey != null && signingPassword != null) {
+            if (signingKeyId != null) {
+                useInMemoryPgpKeys signingKeyId, signingKey, signingPassword
+            } else {
+                useInMemoryPgpKeys signingKey, signingPassword
+            }
+        }
     }
 }
 
