@@ -167,7 +167,7 @@ def mainProjects = subprojects.findAll { it.path.startsWith(':ssolite-') }
 
 configure(mainProjects) {
     group = 'com.github.sahara3'
-    version = '2.0.0-SNAPSHOT'
+    version = '2.0.0-rc.1'
 
     ext {
         isSnapshotVersion = version.endsWith('-SNAPSHOT')
