@@ -1,5 +1,13 @@
 rootProject.name = 'ssolite'
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            from files('versions.toml')
+        }
+    }
+}
+
 include ':ssolite-core'
 include ':ssolite-spring'
 include ':ssolite-spring-boot-autoconfigure'

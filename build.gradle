@@ -3,20 +3,10 @@ import com.github.spotbugs.snom.Effort
 import com.github.spotbugs.snom.SpotBugsTask
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
-buildscript {
-    repositories {
-        maven {
-            url 'https://plugins.gradle.org/m2/'
-        }
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:3.0.13'
-        classpath 'io.spring.gradle:dependency-management-plugin:1.1.4'
-        classpath 'com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.9'
-        classpath 'com.github.sahara3:gradle-tomcat-runner-plugin:0.3.0'
-    }
+plugins {
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.spotbugs) apply false
+    alias(libs.plugins.tomcat.runner) apply false
 }
 
 // ===================================================================
@@ -25,29 +15,6 @@ buildscript {
 configure(allprojects) {
     repositories {
         mavenCentral()
-    }
-
-    apply plugin: 'io.spring.dependency-management'
-
-    dependencyManagement {
-        imports {
-            mavenBom SpringBootPlugin.BOM_COORDINATES
-        }
-
-        dependencies {
-            dependency 'org.projectlombok:lombok:1.18.32'
-
-            dependency 'jakarta.servlet:jakarta.servlet-api:6.0.0'
-            dependency 'javax.servlet:javax.servlet-api:3.1.0'
-            dependency 'jakarta.validation:jakarta.validation-api:3.0.2'
-            dependency 'com.google.code.findbugs:jsr305:3.0.2'
-            dependency 'org.dmfs:rfc3986-uri:0.8.1'
-
-            dependency 'com.squareup.okhttp3:okhttp:4.12.0'
-            dependency 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23'
-
-            dependency 'org.apache.struts:struts2-core:6.3.0.2'
-        }
     }
 
     tasks.register('configurations') {
@@ -70,7 +37,7 @@ configure(allprojects) {
 
 configure(subprojects) {
     apply plugin: 'java'
-    apply plugin: 'com.github.spotbugs'
+    apply plugin: libs.plugins.spotbugs.get().pluginId
 
     ext {
         javaEncoding = 'UTF-8'
@@ -167,7 +134,7 @@ def mainProjects = subprojects.findAll { it.path.startsWith(':ssolite-') }
 
 configure(mainProjects) {
     group = 'com.github.sahara3'
-    version = '2.0.0-rc.1'
+    version = libs.versions.ssolite.get()
 
     ext {
         isSnapshotVersion = version.endsWith('-SNAPSHOT')
@@ -199,19 +166,17 @@ configure(mainProjects) {
     }
 
     dependencies {
-        providedApi 'jakarta.servlet:jakarta.servlet-api'
-        providedApi 'javax.servlet:javax.servlet-api'
-        compileOnly 'com.google.code.findbugs:jsr305'
-        implementation 'org.slf4j:slf4j-api'
+        providedApi libs.jakarta.servlet.api
+        providedApi libs.javax.servlet.api
+        compileOnly libs.jsr305
+        implementation libs.slf4j.api
 
-        testImplementation('org.springframework.boot:spring-boot-starter-test') {
-            exclude group: 'junit', module: 'junit'
-        }
-        testImplementation 'org.junit.jupiter:junit-jupiter-api'
-        testImplementation 'org.junit.jupiter:junit-jupiter-params'
-        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-        testRuntimeOnly 'jakarta.servlet:jakarta.servlet-api'
-        testRuntimeOnly 'javax.servlet:javax.servlet-api'
+        testImplementation libs.spring.boot.starter.test
+        testImplementation libs.junit.jupiter.api
+        testImplementation libs.junit.jupiter.params
+        testRuntimeOnly libs.junit.jupiter.engine
+        testRuntimeOnly libs.jakarta.servlet.api
+        testRuntimeOnly libs.javax.servlet.api
     }
 
     java {
@@ -299,7 +264,7 @@ configure(mainProjects) {
                         // optionalImplementation -> optional=true
                         asNode().dependencies.'*'.findAll {
                             project.configurations.optionalImplementation.allDependencies.find { dep ->
-                                    dep.name == it.artifactId.text()
+                                dep.name == it.artifactId.text()
                             }
                         }.each {
                             it.appendNode('optional').value = 'true'
@@ -369,12 +334,12 @@ configure(project(':ssolite-core')) {
     description = 'A lightweight single sign on library (core module)'
 
     dependencies {
-        compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
-        implementation 'org.dmfs:rfc3986-uri'
-        optionalImplementation 'com.squareup.okhttp3:okhttp'
-        optionalImplementation 'com.fasterxml.jackson.core:jackson-databind'
+        compileOnly libs.kotolin.stdlib
+        implementation libs.rfc3986.uri
+        optionalImplementation libs.okhttp
+        optionalImplementation libs.jackson.databind
 
-        testImplementation 'org.springframework.security:spring-security-web'
+        testImplementation libs.spring.security.web
     }
 }
 
@@ -383,15 +348,15 @@ configure(project(':ssolite-spring')) {
 
     dependencies {
         api project(':ssolite-core')
-        api 'org.springframework.security:spring-security-core'
-        api 'org.springframework.security:spring-security-web'
-        api 'org.springframework.security:spring-security-config'
-        api 'com.fasterxml.jackson.core:jackson-core'
-        api 'com.fasterxml.jackson.core:jackson-databind'
-        api 'com.fasterxml.jackson.core:jackson-annotations'
-        implementation 'org.springframework:spring-core'
-        implementation 'org.springframework:spring-web'
-        optionalImplementation 'org.springframework.boot:spring-boot-starter-actuator'
+        api libs.spring.security.core
+        api libs.spring.security.web
+        api libs.spring.security.config
+        api libs.jackson.core
+        api libs.jackson.databind
+        api libs.jackson.annotations
+        implementation libs.spring.core
+        implementation libs.spring.web
+        optionalImplementation libs.spring.boot.starter.actuator
     }
 }
 
@@ -401,13 +366,13 @@ configure(project(':ssolite-spring-boot-autoconfigure')) {
     dependencies {
         implementation project(':ssolite-core')
         implementation project(':ssolite-spring')
-        implementation 'org.springframework:spring-core'
-        implementation 'org.springframework:spring-context'
-        implementation 'org.springframework.boot:spring-boot'
-        implementation 'org.springframework.boot:spring-boot-autoconfigure'
-        implementation 'org.springframework.security:spring-security-config'
+        implementation libs.spring.core
+        implementation libs.spring.context
+        implementation libs.spring.boot
+        implementation libs.spring.boot.autoconfigure
+        implementation libs.spring.security.config
 
-        compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+        compileOnly libs.spring.boot.configuration.processor
     }
 }
 
@@ -436,13 +401,13 @@ def allSampleProjects = sampleSpringProjects + sampleStrutsProjects
 
 configure(allSampleProjects) {
     dependencies {
-        compileOnly 'org.projectlombok:lombok'
-        annotationProcessor 'org.projectlombok:lombok'
-        testCompileOnly 'org.projectlombok:lombok'
-        testAnnotationProcessor 'org.projectlombok:lombok'
-        compileOnly 'com.google.code.findbugs:jsr305'
+        compileOnly libs.lombok
+        annotationProcessor libs.lombok
+        testCompileOnly libs.lombok
+        testAnnotationProcessor libs.lombok
+        compileOnly libs.jsr305
 
-        implementation 'jakarta.validation:jakarta.validation-api'
+        implementation libs.jakarta.validation.api
     }
 
     tasks.withType(Javadoc).configureEach {
@@ -451,17 +416,18 @@ configure(allSampleProjects) {
 }
 
 configure(sampleSpringProjects) {
-    apply plugin: 'org.springframework.boot'
+    apply plugin: libs.plugins.spring.boot.get().pluginId
 
     dependencies {
+        implementation platform(SpringBootPlugin.BOM_COORDINATES)
         implementation project(':ssolite-spring-boot-starter')
-        implementation 'jakarta.servlet:jakarta.servlet-api'
-        implementation 'org.springframework.boot:spring-boot-starter-web'
-        implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-        implementation 'org.springframework.boot:spring-boot-starter-security'
-        implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-        implementation 'org.slf4j:slf4j-api'
-        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        implementation libs.jakarta.servlet.api
+        implementation libs.spring.boot.starter.web
+        implementation libs.spring.boot.starter.thymeleaf
+        implementation libs.spring.boot.starter.security
+        implementation libs.thymeleaf.extras.springsecurity6
+        implementation libs.slf4j.api
+        implementation libs.spring.boot.starter.actuator
     }
 
     bootRun {
@@ -471,7 +437,7 @@ configure(sampleSpringProjects) {
 
 configure(project(':sample-server-spring')) {
     dependencies {
-        implementation 'org.springframework.session:spring-session-core'
+        implementation libs.spring.session.core
     }
 }
 
@@ -481,27 +447,27 @@ configure(project(':sample-client-spring')) {
 
 configure(sampleStrutsProjects) {
     apply plugin: 'war'
-    apply plugin: 'com.github.sahara3.tomcat-runner'
+    apply plugin: libs.plugins.tomcat.runner.get().pluginId
 
     dependencies {
-        compileOnly 'javax.servlet:javax.servlet-api'
+        compileOnly libs.javax.servlet.api
 
         implementation project(':ssolite-core')
-        implementation 'org.apache.struts:struts2-core'
-        implementation 'org.slf4j:slf4j-api'
-        runtimeOnly 'org.apache.logging.log4j:log4j-slf4j2-impl'
-        runtimeOnly 'org.apache.logging.log4j:log4j-core'
+        implementation libs.struts2.core
+        implementation libs.slf4j.api
+        runtimeOnly libs.log4j.slf4j2.impl
+        runtimeOnly libs.log4j.core
 
-        tomcat 'org.apache.logging.log4j:log4j-slf4j2-impl'
-        tomcat 'org.apache.logging.log4j:log4j-core'
-        tomcat 'org.slf4j:jul-to-slf4j'
+        tomcat libs.log4j.slf4j2.impl
+        tomcat libs.log4j.core
+        tomcat libs.jul.to.slf4j
     }
 }
 
 configure(project(':sample-client-struts2')) {
     dependencies {
-        implementation 'com.squareup.okhttp3:okhttp'
-        implementation 'com.fasterxml.jackson.core:jackson-databind'
+        implementation libs.okhttp
+        implementation libs.jackson.databind
     }
 
     // run this on tomcat.

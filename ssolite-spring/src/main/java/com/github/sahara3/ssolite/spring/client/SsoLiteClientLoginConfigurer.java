@@ -1,5 +1,6 @@
 package com.github.sahara3.ssolite.spring.client;
 
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,7 +21,12 @@ import org.springframework.util.Assert;
 public class SsoLiteClientLoginConfigurer<H extends HttpSecurityBuilder<H>> extends
         AbstractHttpConfigurer<SsoLiteClientLoginConfigurer<H>, H> {
 
-    private final SsoLiteAccessTokenAuthenticationProcessingFilter authenticationFilter;
+    /**
+     * Creates a new SSOLite client authentication configurator.
+     */
+    public SsoLiteClientLoginConfigurer() {
+        // no-op.
+    }
 
     /**
      * Creates a new SSOLite client authentication configurator.
@@ -29,14 +35,22 @@ public class SsoLiteClientLoginConfigurer<H extends HttpSecurityBuilder<H>> exte
      */
     public SsoLiteClientLoginConfigurer(String filterProcessesUrl) {
         Assert.notNull(filterProcessesUrl, "filterProcessesUrl cannot be null");
-        this.authenticationFilter = new SsoLiteAccessTokenAuthenticationProcessingFilter(filterProcessesUrl);
-        this.successHandler = new SsoLiteClientAuthenticationSuccessHandler();
-        this.failureHandler = new SimpleUrlAuthenticationFailureHandler();
+        this.filterProcessesUrl = filterProcessesUrl;
     }
 
-    private final AuthenticationSuccessHandler successHandler;
+    private String filterProcessesUrl = "/sso-login";
 
-    private final AuthenticationFailureHandler failureHandler;
+    public SsoLiteClientLoginConfigurer<H> filterProcessesUrl(String filterProcessesUrl) {
+        Assert.notNull(filterProcessesUrl, "filterProcessesUrl cannot be null");
+        this.filterProcessesUrl = filterProcessesUrl;
+        return this;
+    }
+
+    @Nullable
+    private AuthenticationSuccessHandler successHandler;
+
+    @Nullable
+    private AuthenticationFailureHandler failureHandler;
 
     @Override
     public void init(H http) throws Exception {
@@ -47,27 +61,37 @@ public class SsoLiteClientLoginConfigurer<H extends HttpSecurityBuilder<H>> exte
     public void configure(H http) throws Exception {
         super.configure(http);
 
-        this.authenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
-        this.authenticationFilter.setAuthenticationSuccessHandler(this.successHandler);
-        this.authenticationFilter.setAuthenticationFailureHandler(this.failureHandler);
+        if (this.successHandler == null) {
+            this.successHandler = new SsoLiteClientAuthenticationSuccessHandler();
+        }
+        if (this.failureHandler == null) {
+            this.failureHandler = new SimpleUrlAuthenticationFailureHandler();
+        }
+
+        SsoLiteAccessTokenAuthenticationProcessingFilter authenticationFilter =
+                new SsoLiteAccessTokenAuthenticationProcessingFilter(filterProcessesUrl);
+
+        authenticationFilter.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
+        authenticationFilter.setAuthenticationSuccessHandler(this.successHandler);
+        authenticationFilter.setAuthenticationFailureHandler(this.failureHandler);
         SessionAuthenticationStrategy sessionAuthenticationStrategy =
                 http.getSharedObject(SessionAuthenticationStrategy.class);
         if (sessionAuthenticationStrategy != null) {
-            this.authenticationFilter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
+            authenticationFilter.setSessionAuthenticationStrategy(sessionAuthenticationStrategy);
         }
         RememberMeServices rememberMeServices = http.getSharedObject(RememberMeServices.class);
         if (rememberMeServices != null) {
-            this.authenticationFilter.setRememberMeServices(rememberMeServices);
+            authenticationFilter.setRememberMeServices(rememberMeServices);
         }
 
         SecurityContextRepository securityContextRepository = http.getSharedObject(SecurityContextRepository.class);
         if (securityContextRepository != null) {
-            this.authenticationFilter.setSecurityContextRepository(securityContextRepository);
+            authenticationFilter.setSecurityContextRepository(securityContextRepository);
         }
 
-        this.authenticationFilter.setSecurityContextHolderStrategy(getSecurityContextHolderStrategy());
+        authenticationFilter.setSecurityContextHolderStrategy(getSecurityContextHolderStrategy());
 
-        SsoLiteAccessTokenAuthenticationProcessingFilter filter = this.postProcess(this.authenticationFilter);
+        SsoLiteAccessTokenAuthenticationProcessingFilter filter = this.postProcess(authenticationFilter);
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 }

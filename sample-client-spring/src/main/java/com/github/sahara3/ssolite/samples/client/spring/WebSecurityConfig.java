@@ -67,9 +67,10 @@ public class WebSecurityConfig {
                 )
                 .exceptionHandling(customizer -> customizer
                         .authenticationEntryPoint(entryPoint)
-                );
+                )
+                .with(new SsoLiteClientLoginConfigurer<>(), customizer -> customizer
+                        .filterProcessesUrl("/sso-login"));
 
-        http.apply(new SsoLiteClientLoginConfigurer<>("/sso-login"));
         return http.build();
     }
 

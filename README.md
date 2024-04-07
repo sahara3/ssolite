@@ -7,6 +7,19 @@ uses authenticated information provided by the server.
 The server does not provide authorization mechanism. Authorization is
 a client's job.
 
+## Spring Version Compatibility
+SSOLite provides support for Spring Security and Spring Boot.
+
+Spring Security underwent major changes in version 6, so the SSOLite
+versions are divided into 1.0.x, which supports Spring Security 5,
+and 2.0.x, which supports Spring Security 6.
+
+| SSOLite | Spring Security | Spring Boot |
+|---------|-----------------|-------------|
+| 1.0.x   | 5.x             | 2.x         |
+| 2.0.x   | 6.x             | 3.x         |
+
+
 ## Samples
 
 ### Server sample using Spring
